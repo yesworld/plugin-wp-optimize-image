@@ -1,0 +1,221 @@
+.wpcf7-images-optimize-upload-wrap .wpcf7-upload_image {
+    display: none;
+}
+.wpcf7-images-optimize-upload-wrap .images-optimize-upload-handler {
+    text-align: center;
+    padding: 30px 30px 35px 30px;
+    border: 3px dashed #ccc;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    position: relative;
+    margin: 0 0 20px 0;
+    background: white;
+}
+.wpcf7-images-optimize-upload-wrap .images-optimize-upload-handler.hover .images-optimize-upload-container {
+    position: relative;
+}
+.wpcf7-images-optimize-upload-wrap .images-optimize-upload-handler.hover {
+    border: 3px dashed #00b9eb;
+}
+.wpcf7-images-optimize-upload-wrap .images-optimize-upload-handler h3 {
+    margin: 0;
+    color: #999;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-top: 42px;
+}
+.wpcf7-images-optimize-upload-wrap .images-optimize-upload-handler h3:before {
+    content: "\21E9";
+    position: absolute;
+    left: 50%;
+    top: -10px;
+    display: block;
+    width: 42px;
+    border-bottom: 2px solid #999;
+    text-align: center;
+    margin-left: -21px;
+}
+.wpcf7-images-optimize-upload-wrap .images-optimize-upload-inner > span {
+    font-family: sans-serif;
+    color: #ccc;
+}
+.wpcf7-images-optimize-upload-wrap .images-optimize-upload-button {
+    display: inline-block;
+    background: #00b9eb;
+    color: #fff;
+    padding: 5px 30px;
+    font-family: sans-serif;
+    text-decoration: none !important;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+.wpcf7-images-optimize-upload-wrap .images-optimize-upload-button:hover {
+    background: #00a0cc;
+}
+.wpcf7-images-optimize-upload-wrap .images-optimize-upload-handler .images-optimize-upload-container {
+    position: relative;
+}
+.wpcf7-images-optimize-upload-wrap .list {
+    border: 0;
+    padding: 0;
+    list-style: none;
+    margin: 0 0 20px 0;
+}
+.wpcf7-images-optimize-upload-wrap .list li {
+    border: 1px solid #ccc;
+    line-height: 24px;
+    margin: 0 0 10px 0;
+    position: relative;
+    height: 100px;
+    display: block;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+.wpcf7-images-optimize-upload-wrap .list li .thumbnail {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    display: inline-block;
+    float: left;
+    margin: -1px 20px -1px -1px;
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+}
+.wpcf7-images-optimize-upload-wrap .list li .thumbnail img {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    object-fit: cover;
+    object-position: center;
+}
+.wpcf7-images-optimize-upload-wrap .list li span {
+    border: 0;
+    line-height: 20px;
+    font-family: sans-serif;
+    font-size: 17px;
+    display: block;
+    color: #777;
+    margin: 5px 15px 0px 15px;
+}
+.wpcf7-images-optimize-upload-wrap .list li span:first-of-type {
+    font-weight: bold;
+    margin-top: 13px;
+    max-width: 100%;
+    white-space: nowrap;
+    color: #000;
+}
+.wpcf7-images-optimize-upload-wrap .list li span:last-of-type {
+    color: #ccc;
+    font-style: italic;
+    display: block;
+}
+.wpcf7-images-optimize-upload-wrap .list li del {
+    border: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: #fff;
+    text-decoration: none;
+    font-weight: normal;
+    background: #f66;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+    margin: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+.wpcf7-images-optimize-upload-wrap .list li del:hover:before {
+    content: attr(data-note);
+    display: block;
+    position: absolute;
+    right: 30px;
+    background: #f66;
+    z-index: 999;
+    height: 20px;
+    width: 100px;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    font-family: sans-serif;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.wpcf7-images-optimize-upload-wrap .list li del:hover:after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 7px 0 7px 4px;
+    border-color: transparent transparent transparent #f66;
+    position: absolute;
+    right: 26px;
+    top: 3px;
+}
+.wpcf7-response-output.images-optimize-upload-error {
+    display: none;
+}
+.images-optimize-upload-error {
+    margin: 2em 0.5em 1em;
+    padding: 0.2em 1em;
+    border: 2px solid #ff0000;
+}
+@media only screen and (max-width: 480px) {
+    .wpcf7-images-optimize-upload-wrap .images-optimize-upload-handler h3 {
+        font-size: 1em;
+    }
+    .wpcf7-images-optimize-upload-wrap .list li {
+        height: auto;
+    }
+    .wpcf7-images-optimize-upload-wrap .list li .thumbnail {
+        width: 100%;
+        height: 100%;
+        margin: -1px -1px 0 -1px;
+        border: 0;
+        float: none;
+    }
+    .wpcf7-images-optimize-upload-wrap .list li .thumbnail img {
+        width: 100%;
+        height: 100%;
+        max-height: 480px;
+    }
+    .wpcf7-images-optimize-upload-wrap .list li span:first-of-type{
+        margin-top: 5px;
+        display: block;
+        max-width: 100%;
+    }
+    .wpcf7-images-optimize-upload-wrap .list li br {
+        display: none;
+    }
+    .wpcf7-images-optimize-upload-wrap .list li span:last-of-type {
+        display: block;
+        margin: 5px 15px 10px 15px;
+        max-width: 100%;
+    }
+    .wpcf7-images-optimize-upload-wrap .list li del {
+        width: 40px;
+        height: 40px;
+        font-size: 40px;
+        line-height: 40px;
+        -webkit-border-radius: 20px;
+        -moz-border-radius: 20px;
+        border-radius: 20px;
+        margin: 20px;
+    }
+}
