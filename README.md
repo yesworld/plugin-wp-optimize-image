@@ -25,6 +25,17 @@
 - Transparent background in PNG files will become solid black
 - Animated GIF files will only have 1st frame after compression
 
+![banner](screenshot-setting.png)
+
 ### How to custom install this plugin:
 - Upload the plugin files to the /wp-content/plugins/images-optimize-and-upload-cf7/ directory, or install the plugin through the WordPress plugins screen directly.
 - Activate the plugin through the ‘Plugins’ screen in WordPress
+
+### Dependency
+- [client-compress](https://github.com/davejm/client-compress) - A JavaScript client side image compression library. This library uses the Canvas API to compress the image, and thus will not work on the node.js server-side. This library is forked from compress.js. This version has been updated to use the latest packages, uses async/await, fixes bugs, offers more options and a cleaner API.
+
+## License
+
+[MIT License](./LICENSE)
+
+Copyright (c) :suspect: @yesworld, @bruklig
