@@ -2,8 +2,8 @@
 Contributors: yesworld, bruklig
 Tags: image, compression, optimization, contact form 7, ajax uploader, drag and drop, multiple file, upload, contact form 7 uploader
 Requires at least: 5.2.2
-Tested up to: 5.2.2
-Stable tag: 1.1.0
+Tested up to: 5.3
+Stable tag: 2.0.0
 Requires PHP: 5.2
 License: GNU GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -26,6 +26,7 @@ Images Optimize and Upload CF7 is an extension plugin for [Contact Form 7](https
 * Drag-n-drop or browse file
 * Attach compressed files to emails
 * Adapted to mobile design
+* Customize file upload thumbnails layout.
 * Automatically removes all temp files from the server after sending the form
 * Supports Google Chrome, Mozilla Firefox, Microsoft Edge, Safari. Doesn't support IE 11 and lower.
 
@@ -33,7 +34,6 @@ Images Optimize and Upload CF7 is an extension plugin for [Contact Form 7](https
 
 * Transparent background in PNG files will become solid black
 * Animated GIF files will only have 1st frame after compression
-* User can upload only 2 files
 * Doesn't support IE
 
 == Frequently Asked Questions ==
@@ -57,8 +57,13 @@ To install this plugin see below:
 
 == Changelog ==
 
+= 2.0.0 =
+Fix file extension error, lower case and uppercase.
+Added file limit settings.
+Added template editor for file upload thumbnails.
+
 = 1.1.0 =
-Fix styles for mobile
+Fix styles for mobile.
 
 = 1.0.9 =
 Microsoft Edge support.
