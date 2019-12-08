@@ -38,4 +38,4 @@
 
 [MIT License](./LICENSE)
 
-Copyright (c) :suspect: @yesworld, @bruklig
+Copyright (c) :suspect: @yesworld, [@bruklig](https://github.com/bruklig)
