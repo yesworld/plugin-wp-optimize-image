@@ -5,10 +5,9 @@ echo '<form method="post" action="options.php">';
 
 $selectedResize = get_option('yr-images-optimize-upload-resize', true);
 $throwIfSizeNotReached = get_option('yr-images-optimize-upload-throwIfSizeNotReached');
-$templatePreview = esc_html(get_option('yr-images-optimize-upload-template'));
-if (!$templatePreview) {
-    $templatePreview = Yr3kUploaderSettings::TMPL_PREVIEW;
-}
+
+$templatePreview = esc_html(get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()));
+$templateDndArea = esc_html(get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()));
 
 settings_fields(YR3K_UPLOAD_REGISTRATION_NAME);
 do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
@@ -84,6 +83,19 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
       </td>
   </tr>
   <tr>
+    <th scope="row"><label for="yr-images-optimize-upload-template-dnd">Drag & Drop Area Template</label></th>
+    <td>
+      <fieldset>
+        <textarea name="yr-images-optimize-upload-template-dnd"
+                  rows="10"
+                  cols="50"
+                  id="yr-images-optimize-upload-template-dnd"
+                  class="large-text code"
+                  placeholder='<?php echo Yr3kUploaderSettings::getTemplateDndArea(); ?>'
+        ><?php echo $templateDndArea; ?></textarea>
+      </fieldset></td>
+  </tr>
+  <tr>
     <th scope="row"><label for="yr-images-optimize-upload-template"><?php echo esc_html(__('Images Preview Template', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
     <td>
       <fieldset>
@@ -92,7 +104,7 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
                   cols="50"
                   id="yr-images-optimize-upload-template"
                   class="large-text code"
-                  placeholder='<?php echo Yr3kUploaderSettings::TMPL_PREVIEW; ?>'
+                  placeholder='<?php echo Yr3kUploaderSettings::getTemplatePreview(); ?>'
         ><?php echo $templatePreview; ?></textarea>
         <p class="description"><?php echo esc_html(__('The template which is used to generate images previews on the front end. This field can not be empty.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
         <p class="description">{{photoName}} - <?php echo esc_html(__('Uploaded image file name.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>

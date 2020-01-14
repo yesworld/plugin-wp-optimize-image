@@ -12,6 +12,7 @@ jQuery(document).ready(function($){
     maxHeight: +YR3K_UPLOADER_OPTIONS.maxHeight,
     resize: YR3K_UPLOADER_OPTIONS.resize == 1,
     throwIfSizeNotReached: YR3K_UPLOADER_OPTIONS.throwIfSizeNotReached == 1,
-    templatePreview: YR3K_UPLOADER_OPTIONS.templatePreview
+    templatePreview: YR3K_UPLOADER_OPTIONS.templatePreview,
+    templateDndArea: YR3K_UPLOADER_OPTIONS.templateDndArea,
   });
 });

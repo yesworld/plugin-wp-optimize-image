@@ -244,10 +244,8 @@ class Yr3kUploaderFrontend
                 'formatFile' => YR3K_UPLOAD_TYPE_FILES,
                 'maxFile' => $maxFiles,
                 'templatePreview' => $templatePreview,
+                'templateDndArea' => get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()),
                 'language' => [
-                    'dnd_text' => __('Drag & Drop Images Here', YR3K_UPLOAD_REGISTRATION_NAME),
-                    'dnd_or' => __('or', YR3K_UPLOAD_REGISTRATION_NAME),
-                    'dnd_browse' => __('Browse Files', YR3K_UPLOAD_REGISTRATION_NAME),
                     'dnd_error_max_files' => $textError,
                     'info_file_origin' => __('Original size', YR3K_UPLOAD_REGISTRATION_NAME),
                     'info_file_compress' => __('Compressed', YR3K_UPLOAD_REGISTRATION_NAME),

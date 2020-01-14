@@ -58,6 +58,7 @@ class Yr3kUploaderAdmin
         'yr-images-optimize-upload-resize',
         'yr-images-optimize-upload-throwIfSizeNotReached',
         'yr-images-optimize-upload-maxFiles',
+        'yr-images-optimize-upload-template-dnd',
         'yr-images-optimize-upload-template',
     ];
 

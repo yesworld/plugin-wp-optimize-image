@@ -6,9 +6,6 @@ jQuery(document).ready(function($){
     var setting = $.extend({
       error_max_files: language.dnd_error_max_files,
 
-      dnd_text: language.dnd_text,
-      dnd_or: language.dnd_or,
-      dnd_browse: language.dnd_browse,
       info_file_origin: language.info_file_origin,
       info_file_compress: language.info_file_compress,
       wrong_format: language.wrong_format,
@@ -27,17 +24,18 @@ jQuery(document).ready(function($){
       resize: true,
       throwIfSizeNotReached: false,
 
-      templatePreview: ''
+      templatePreview: '',
+      templateDndArea: '',
     }, options);
 
-    var MAXFILE = setting.maxFile;
+    var MAXFILE = setting.maxFile
     var txtErrorMaxFiles = setting.error_max_files
     var txtErrorFormat = setting.wrong_format
 
     var th = this
     var countImages = 0;
 
-    var bodyHTML = '<div class="images-optimize-upload-handler"><div class="images-optimize-upload-container"><div class="images-optimize-upload-inner"><h3>' + setting.dnd_text + "</h3><span>" + setting.dnd_or + '</span><div class="images-optimize-upload-button-wrap"><a class="images-optimize-upload-button" href="javascript:void(0)">' + setting.dnd_browse + "</a></div></div></div></div>";
+    var bodyHTML = '<div class="images-optimize-upload-handler"><div class="images-optimize-upload-container"><div class="images-optimize-upload-inner">' + setting.templateDndArea + '</div></div></div>';
     this.wrapAll('<div class="images-optimize-upload-wrapper"></div>');
 
     var $dropZone = this.parents('.images-optimize-upload-wrapper');
@@ -214,7 +212,6 @@ jQuery(document).ready(function($){
         processData: false,
         success: function(res) {
           disableForm(false);
-          console.log('success: ',res)
 
           if (!res.success) {
             return;
