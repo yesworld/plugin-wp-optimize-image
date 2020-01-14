@@ -223,11 +223,6 @@ class Yr3kUploaderFrontend
         $textError = _n('Maximum %d image is allowed.', 'Maximum %d images is allowed.', $maxFiles, YR3K_UPLOAD_REGISTRATION_NAME);
         $textError = sprintf($textError, $maxFiles);
 
-        $templatePreview = get_option('yr-images-optimize-upload-template');
-        if (!$templatePreview) {
-            $templatePreview = Yr3kUploaderSettings::TMPL_PREVIEW;
-        }
-
         wp_localize_script(
             self::NAME_HANDLE,
             'YR3K_UPLOADER_OPTIONS',
@@ -243,7 +238,7 @@ class Yr3kUploaderFrontend
                 'throwIfSizeNotReached' => $throwIfSizeNotReached ? $throwIfSizeNotReached : 0,
                 'formatFile' => YR3K_UPLOAD_TYPE_FILES,
                 'maxFile' => $maxFiles,
-                'templatePreview' => $templatePreview,
+				'templatePreview' => get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()),
                 'templateDndArea' => get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()),
                 'language' => [
                     'dnd_error_max_files' => $textError,

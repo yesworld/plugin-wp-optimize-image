@@ -83,7 +83,7 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
       </td>
   </tr>
   <tr>
-    <th scope="row"><label for="yr-images-optimize-upload-template-dnd">Drag & Drop Area Template</label></th>
+    <th scope="row"><label for="yr-images-optimize-upload-template-dnd"><?php echo esc_html(__('Drag & Drop Area Template', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
     <td>
       <fieldset>
         <textarea name="yr-images-optimize-upload-template-dnd"
@@ -93,6 +93,7 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
                   class="large-text code"
                   placeholder='<?php echo Yr3kUploaderSettings::getTemplateDndArea(); ?>'
         ><?php echo $templateDndArea; ?></textarea>
+        <p class="description"><?php echo esc_html(__('The template which is used to generate drag and drop area on the front end. Be careful when editing this field.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
       </fieldset></td>
   </tr>
   <tr>
