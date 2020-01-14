@@ -196,6 +196,14 @@ msgstr ""
 "достигнут."
 
 #: views/form.settings.optimizer.php:103
+msgid "Drag & Drop Area Template"
+msgstr "Шаблон поля drag & drop"
+
+#: views/form.settings.optimizer.php:103
+msgid "The template which is used to generate drag and drop area on the front end. Be careful when editing this field."
+msgstr "Шаблон, который используется для генерации поля drag & drop на фронт-енде. Редактируйте это поле с осторожностью."
+
+#: views/form.settings.optimizer.php:103
 msgid ""
 "The template which is used to generate images previews on the front end. "
 "This field can not be empty."
