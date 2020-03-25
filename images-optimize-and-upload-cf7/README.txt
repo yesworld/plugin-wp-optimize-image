@@ -3,7 +3,7 @@ Contributors: yesworld, bruklig
 Tags: image, compression, optimization, contact form 7, ajax uploader, drag and drop, multiple file, upload, contact form 7 uploader
 Requires at least: 5.2.2
 Tested up to: 5.3.2
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 Requires PHP: 5.2
 License: GNU GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html

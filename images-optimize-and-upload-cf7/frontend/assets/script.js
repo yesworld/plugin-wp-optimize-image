@@ -4,8 +4,6 @@ jQuery(document).ready(function($){
     var language = YR3K_UPLOADER_OPTIONS.language;
 
     var setting = $.extend({
-      error_max_files: language.dnd_error_max_files,
-
       info_file_origin: language.info_file_origin,
       info_file_compress: language.info_file_compress,
       wrong_format: language.wrong_format,
@@ -13,7 +11,6 @@ jQuery(document).ready(function($){
 
       ajax_url: YR3K_UPLOADER_OPTIONS.ajax_url,
       formatFile: new RegExp('\.('+ YR3K_UPLOADER_OPTIONS.formatFile +')$', 'i'),
-      maxFile: YR3K_UPLOADER_OPTIONS.maxFile,
 
       targetSize: 0.25,
       quality: 0.75,
@@ -28,11 +25,12 @@ jQuery(document).ready(function($){
       templateDndArea: '',
     }, options);
 
-    var MAXFILE = setting.maxFile
-    var txtErrorMaxFiles = setting.error_max_files
+    var MAXFILE = +this.attr('max-file')
+    var txtErrorMaxFiles = this.attr('max-file-error')
     var txtErrorFormat = setting.wrong_format
 
     var th = this
+    var ID = this.attr('id') === void 0 ? 0 : this.attr('id')
     var countImages = 0;
 
     var bodyHTML = '<div class="images-optimize-upload-handler"><div class="images-optimize-upload-container"><div class="images-optimize-upload-inner">' + setting.templateDndArea + '</div></div></div>';
@@ -150,6 +148,7 @@ jQuery(document).ready(function($){
           }
 
           formData.append("action", "yr_api_uploader");
+          formData.append("id", ID);
           send(formData)
       })
 

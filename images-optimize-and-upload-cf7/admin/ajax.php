@@ -29,21 +29,13 @@ class Yr3kUploaderApi
     public function upload()
     {
         $files = $this->prepareFiles($_FILES[self::KEY_FILES]);
+        $formId = $_POST['id'];
 
         $uploads_dir = wpcf7_maybe_add_random_dir(YR3K_UPLOAD_TEMP_DIR);
         $randomFolder = basename($uploads_dir);
 
-        $maxFiles = (int) get_option('yr-images-optimize-upload-maxFiles', 3);
-
         $json = [];
         foreach ($files as $k => $file) {
-            if ($maxFiles == $k) {
-                $textError = _n('Maximum %d image is allowed.', 'Maximum %d images is allowed.', $maxFiles, YR3K_UPLOAD_REGISTRATION_NAME);
-                $textError = sprintf($textError, $maxFiles);
-                wp_send_json_error($textError);
-
-                return;
-            }
 
             if (!is_uploaded_file($file['tmp_name'])) {
                 wp_send_json_error(wpcf7_get_message('upload_failed'));
@@ -66,6 +58,7 @@ class Yr3kUploaderApi
 
             // Generate new unique filename
             $filename = wp_unique_filename($uploads_dir, $filename);
+            $filename = $formId == '0' ? $filename : 'ID_' . $formId . '_' . $filename;
             $new_file = path_join($uploads_dir, $filename);
 
             // Upload File
