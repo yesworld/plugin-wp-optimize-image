@@ -3,7 +3,7 @@ Contributors: yesworld, bruklig
 Tags: image, compression, optimization, contact form 7, ajax uploader, drag and drop, multiple file, upload, contact form 7 uploader
 Requires at least: 5.2.2
 Tested up to: 5.3.2
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 Requires PHP: 5.2
 License: GNU GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -26,8 +26,10 @@ Images Optimize and Upload CF7 is an extension plugin for [Contact Form 7](https
 * Drag-n-drop or browse file
 * Attach compressed files to emails
 * Adapted to mobile design
-* Customize file upload thumbnails and drag and drop area layouts.
-* Automatically removes all temp files from the server after sending the form
+* Customize file upload thumbnails and drag and drop area layouts
+* Multiple shortcodes in one form
+* Set the maximum uploaded files limit in global settings, or in the shortcode
+* Automatically removes all temporary files from the server after sending the form, but if you want to keep the files on the server, please, install [Contact Form 7 Database Addon – CFDB7] (https://wordpress.org/plugins/contact-form-cfdb7/) plugin.
 * Supports Google Chrome, Mozilla Firefox, Microsoft Edge, Safari. Doesn't support IE 11 and lower.
 
 = Limitations =
@@ -56,6 +58,11 @@ To install this plugin see below:
 3. Drag-n-Drop Field and File Attachment - Front End
 
 == Changelog ==
+
+= 2.0.2 =
+Added an option to keep the files on the server, need to install Contact Form 7 Database Addon – CFDB7 plugin.
+Added an option to set the maximum upload files limit in the shortcode.
+Added the support of multiple shortcodes in one form.
 
 = 2.0.1 =
 Added template for editing drag and drop area layout.
