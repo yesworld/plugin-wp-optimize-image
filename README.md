@@ -26,6 +26,7 @@
 - Animated GIF files will only have 1st frame after compression
 
 ![banner](screenshot-2.png)
+![banner](screenshot-1.png)
 
 ### How to custom install this plugin:
 - Upload the plugin files to the /wp-content/plugins/images-optimize-and-upload-cf7/ directory, or install the plugin through the WordPress plugins screen directly.
