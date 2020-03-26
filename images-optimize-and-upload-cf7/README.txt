@@ -28,6 +28,7 @@ Images Optimize and Upload CF7 is an extension plugin for [Contact Form 7](https
 * Adapted to mobile design
 * Customize file upload thumbnails and drag and drop area layouts
 * Multiple shortcodes in one form
+* Identify files by adding ID to the shortcode. The ID value will be used as a prefix in the filename.
 * Set the maximum uploaded files limit in global settings, or in the shortcode
 * Automatically removes all temporary files from the server after sending the form, but if you want to keep the files on the server, please, install [Contact Form 7 Database Addon – CFDB7] (https://wordpress.org/plugins/contact-form-cfdb7/) plugin.
 * Supports Google Chrome, Mozilla Firefox, Microsoft Edge, Safari. Doesn't support IE 11 and lower.
@@ -63,6 +64,7 @@ To install this plugin see below:
 Added an option to keep the files on the server, need to install Contact Form 7 Database Addon – CFDB7 plugin.
 Added an option to set the maximum upload files limit in the shortcode.
 Added the support of multiple shortcodes in one form.
+Added an option to add a prefix to files from the ID value of the shortcode.
 
 = 2.0.1 =
 Added template for editing drag and drop area layout.
