@@ -16,17 +16,10 @@
         <th scope="row"><label for="<?php echo esc_attr($prefix.'-name'); ?>"><?php echo esc_html(__('Name', 'contact-form-7')); ?></label></th>
         <td><input type="text" name="name" class="tg-name oneline" id="<?php echo esc_attr($prefix.'-name'); ?>" /></td>
       </tr>
-
-      <?php //TODO: PRO version?>
-      <!--tr>
-        <th scope="row"><label for="<?php echo esc_attr($prefix.'-filetypes'); ?>"><?php echo esc_html(__('Acceptable file types', 'contact-form-7')); ?></label></th>
-        <td><input type="text" name="filetypes" class="filetype oneline option" placeholder="gif|png|jpg|jpeg" id="<?php echo esc_attr($prefix.'-filetypes'); ?>" /></td>
-      </tr>
       <tr>
         <th scope="row"><label for="<?php echo esc_attr($prefix.'-max-file'); ?>"><?php echo esc_html(__('Max file upload', 'contact-form-7')); ?></label></th>
-        <td><input type="text" name="max-file" class="filetype oneline option" placeholder="10" id="<?php echo esc_attr($prefix.'-max-file'); ?>" /></td>
-      </tr-->
-
+        <td><input type="text" name="max-file" class="filetype oneline option" placeholder="3 default" id="<?php echo esc_attr($prefix.'-max-file'); ?>" /></td>
+      </tr>
       <tr>
         <th scope="row"><label for="<?php echo esc_attr($prefix.'-id'); ?>"><?php echo esc_html(__('Id attribute', 'contact-form-7')); ?></label></th>
         <td><input type="text" name="id" class="idvalue oneline option" id="<?php echo esc_attr($prefix.'-id'); ?>" /></td>

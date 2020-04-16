@@ -4,8 +4,6 @@ jQuery(document).ready(function($){
     var language = YR3K_UPLOADER_OPTIONS.language;
 
     var setting = $.extend({
-      error_max_files: language.dnd_error_max_files,
-
       info_file_origin: language.info_file_origin,
       info_file_compress: language.info_file_compress,
       wrong_format: language.wrong_format,
@@ -13,7 +11,6 @@ jQuery(document).ready(function($){
 
       ajax_url: YR3K_UPLOADER_OPTIONS.ajax_url,
       formatFile: new RegExp('\.('+ YR3K_UPLOADER_OPTIONS.formatFile +')$', 'i'),
-      maxFile: YR3K_UPLOADER_OPTIONS.maxFile,
 
       targetSize: 0.25,
       quality: 0.75,
@@ -28,11 +25,14 @@ jQuery(document).ready(function($){
       templateDndArea: '',
     }, options);
 
-    var MAXFILE = setting.maxFile
-    var txtErrorMaxFiles = setting.error_max_files
+    var MAXFILE = +this.attr('max-file')
+    var NAME_TAG = $(this).data('name')
+    var txtErrorMaxFiles = this.attr('max-file-error')
     var txtErrorFormat = setting.wrong_format
 
     var th = this
+    var ID = this.attr('id') ? this.attr('id') : 0
+
     var countImages = 0;
 
     var bodyHTML = '<div class="images-optimize-upload-handler"><div class="images-optimize-upload-container"><div class="images-optimize-upload-inner">' + setting.templateDndArea + '</div></div></div>';
@@ -85,8 +85,7 @@ jQuery(document).ready(function($){
       // click to remove image
       $list.on('click', 'li del', function(e){
         var $li = $(this).parent();
-        var key = $li.find('input[type="hidden"]').val();
-        deleteImage(key)
+        deleteImage($li.find('input[type="hidden"]').val())
 
         $li.remove();
         countImages--
@@ -150,6 +149,7 @@ jQuery(document).ready(function($){
           }
 
           formData.append("action", "yr_api_uploader");
+          formData.append("id", ID);
           send(formData)
       })
 
@@ -219,9 +219,9 @@ jQuery(document).ready(function($){
 
           for (var i=0; i < res.data.length; i++) {
             var key = res.data[i].key;
-            var value = res.data[i].value;
-            $list.find('li.yr3k-'+key)
-              .append('<input type="hidden" name="upload-image[]" value="'+ value +'">')
+            var value = res.data[i].temp + '/' + res.data[i].value;
+            $list.find('li.yr3k-' + key)
+              .append('<input type="hidden" name="' + NAME_TAG + '[]" value="' + value + '">')
               .show();
           }
 
@@ -235,12 +235,12 @@ jQuery(document).ready(function($){
 
     /**
      * Delete an image
-     * @param key
+     * @param file
      */
-    function deleteImage(key) {
+    function deleteImage(file) {
       var data = {
         action: 'yr_api_delete',
-        key: key
+        file: file
       }
 
       $.ajax({

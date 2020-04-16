@@ -23,7 +23,7 @@ class Yr3kUploaderSettings
 
     static function getTemplateDndArea() {
         return sprintf(
-            '<h3>%s</h3><span>%s</span><div class="images-optimize-upload-button-wrap"><a class="images-optimize-upload-button" href="javascript:void(0)">%s</a></div>',
+            '<h3>%s</h3><span>%s</span><div class="images-optimize-upload-button-wrap"><a class="images-optimize-upload-button" href="#">%s</a></div>',
             __('Drag & Drop Images Here', YR3K_UPLOAD_REGISTRATION_NAME),
             __('or', YR3K_UPLOAD_REGISTRATION_NAME),
             __('Browse Files', YR3K_UPLOAD_REGISTRATION_NAME)

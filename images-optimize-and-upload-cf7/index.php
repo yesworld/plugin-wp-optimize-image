@@ -6,9 +6,9 @@
  * Author URI: https://github.com/yesworld
  * Domain Path: /languages
  * License: GPL2
- * Version: 2.0.1
+ * Version: 2.1.0
  */
-define('YR3K_UPLOAD_VERSION', '2.0.1');
+define('YR3K_UPLOAD_VERSION', '2.1.0');
 define('YR3K_UPLOAD_REQUIRED_WP_VERSION', '4.9');
 define('YR3K_UPLOAD_PATH', plugin_dir_path(__FILE__));
 define('YR3K_UPLOAD_REGISTRATION_NAME', dirname(plugin_basename(__FILE__)));
@@ -25,7 +25,6 @@ define('YR3K_UPLOAD_ERRORS', [
 ]);
 
 require_once YR3K_UPLOAD_PATH.'admin/settings.php';
-require_once YR3K_UPLOAD_PATH.'helper/baseEncoder.php';
 require_once YR3K_UPLOAD_PATH.'admin/ajax.php';
 
 new Yr3kUploaderApi();

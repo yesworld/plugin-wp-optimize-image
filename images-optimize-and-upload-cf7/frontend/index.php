@@ -3,7 +3,6 @@
 class Yr3kUploaderFrontend
 {
     const NAME_HANDLE = 'yr3k-optimizer-3000';
-    const KEY_FILES = 'upload-image';
 
     public function __construct()
     {
@@ -28,35 +27,12 @@ class Yr3kUploaderFrontend
      */
     public function validation($result, $tag)
     {
-        $files = (isset($_POST[self::KEY_FILES]) ? $_POST[self::KEY_FILES] : []);
+        $name = $tag->name;
+        $files = isset($_POST[$name]) ? $_POST[$name] : [];
 
         // Check if we have files or if it's empty
         if (!is_array($files) || (0 == count($files) && $tag->is_required())) {
             $result->invalidate($tag, wpcf7_get_message('invalid_required'));
-
-            return $result;
-        }
-
-        $maxFiles = (int) get_option('yr-images-optimize-upload-maxFiles', 3);
-        if (count($files) > $maxFiles) {
-            $textError = _n('Maximum %d image is allowed.', 'Maximum %d images are allowed.', $maxFiles, YR3K_UPLOAD_REGISTRATION_NAME);
-            $textError = sprintf($textError, $maxFiles);
-            $result->invalidate($tag, $textError);
-
-            return $result;
-        }
-
-        foreach ($files as $raw) {
-            $str = sanitize_text_field($raw);
-            $pathFile = Yr3kBaseEncoder::decode($str);
-
-            if (2 == count($pathFile)) {
-                continue;
-            }
-
-            $result->invalidate($tag, wpcf7_get_message('invalid_required'));
-
-            return $result;
         }
 
         return $result;
@@ -104,19 +80,26 @@ class Yr3kUploaderFrontend
         // Get posted data
         $posts = $submission->get_posted_data();
 
-        if (!isset($posts[self::KEY_FILES]) || 0 == count($posts[self::KEY_FILES])) {
-            return $wpcf7;
-        }
+        // Find all tags of the form
+        $tags = $wpcf7->scan_form_tags();
 
         $files = [];
-        foreach ($posts[self::KEY_FILES] as $key => $raw) {
-            $pathFile = Yr3kBaseEncoder::decode($raw);
+        foreach ($tags as $tag) {
+            if ($tag->basetype !== 'upload_image') {
+                continue;
+            }
 
-            $file = implode('/', $pathFile);
+            if (!isset($posts[$tag->name]) || 0 === count($posts[$tag->name])) {
+                return $wpcf7;
+            }
 
-            $fullPath = path_join(YR3K_UPLOAD_TEMP_DIR, $file);
-            $files[] = $fullPath;
-            $submission->add_uploaded_file($pathFile[1], $fullPath);
+            foreach ($posts[$tag->name] as $file) {
+                $fullPath = path_join(YR3K_UPLOAD_TEMP_DIR, $file);
+                $files[] = $fullPath;
+
+                $splitFile = explode('/', $file);
+                $submission->add_uploaded_file($splitFile[1], $fullPath);
+            }
         }
 
         // Prop email
@@ -152,8 +135,6 @@ class Yr3kUploaderFrontend
             return '';
         }
 
-        $this->load_enqueue_script();
-
         $validation_error = wpcf7_get_validation_error($tag->name);
         $class = wpcf7_form_controls_class($tag->type);
 
@@ -173,7 +154,14 @@ class Yr3kUploaderFrontend
 
         $atts['aria-invalid'] = $validation_error ? 'true' : 'false';
         $atts['type'] = 'file';
-        $atts['name'] = $tag->name;
+        $atts['data-name'] = $tag->name;
+
+        $dataTag = $this->parseTagMaxFile($tag);
+
+        $atts['max-file-error'] = $dataTag['max-file-error'];
+        $atts['max-file'] = $dataTag['max-file'];
+
+        $this->load_enqueue_script();
 
         return $this->template(
             sanitize_html_class($tag->name),
@@ -219,9 +207,6 @@ class Yr3kUploaderFrontend
         $maxHeight = get_option('yr-images-optimize-upload-maxHeight');
         $resize = get_option('yr-images-optimize-upload-resize');
         $throwIfSizeNotReached = get_option('yr-images-optimize-upload-throwIfSizeNotReached');
-        $maxFiles = (int) get_option('yr-images-optimize-upload-maxFiles', 3);
-        $textError = _n('Maximum %d image is allowed.', 'Maximum %d images is allowed.', $maxFiles, YR3K_UPLOAD_REGISTRATION_NAME);
-        $textError = sprintf($textError, $maxFiles);
 
         wp_localize_script(
             self::NAME_HANDLE,
@@ -237,11 +222,9 @@ class Yr3kUploaderFrontend
                 'resize' => $resize ? $resize : 1,
                 'throwIfSizeNotReached' => $throwIfSizeNotReached ? $throwIfSizeNotReached : 0,
                 'formatFile' => YR3K_UPLOAD_TYPE_FILES,
-                'maxFile' => $maxFiles,
-				'templatePreview' => get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()),
+                'templatePreview' => get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()),
                 'templateDndArea' => get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()),
                 'language' => [
-                    'dnd_error_max_files' => $textError,
                     'info_file_origin' => __('Original size', YR3K_UPLOAD_REGISTRATION_NAME),
                     'info_file_compress' => __('Compressed', YR3K_UPLOAD_REGISTRATION_NAME),
                     'info_file_delete' => __('Delete', YR3K_UPLOAD_REGISTRATION_NAME),
@@ -256,6 +239,24 @@ class Yr3kUploaderFrontend
             '',
             YR3K_UPLOAD_VERSION
         );
+    }
+
+    /**
+     * @param WPCF7_FormTag $tag
+     *
+     * @return array
+     */
+    private function parseTagMaxFile(WPCF7_FormTag $tag) {
+        $maxFiles = $tag->get_option('max-file','', true);
+        if (!$maxFiles) {
+            $maxFiles = get_option('yr-images-optimize-upload-maxFiles', 3);
+        }
+        $textError = _n('Maximum %d image is allowed.', 'Maximum %d images is allowed.', $maxFiles, YR3K_UPLOAD_REGISTRATION_NAME);
+
+        return [
+            'max-file' => (int) $maxFiles,
+            'max-file-error' => sprintf($textError, $maxFiles),
+        ];
     }
 
     /**
