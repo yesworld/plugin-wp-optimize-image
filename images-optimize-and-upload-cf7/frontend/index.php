@@ -3,7 +3,6 @@
 class Yr3kUploaderFrontend
 {
     const NAME_HANDLE = 'yr3k-optimizer-3000';
-    const KEY_FILES = 'upload-image';
 
     public function __construct()
     {
@@ -28,34 +27,12 @@ class Yr3kUploaderFrontend
      */
     public function validation($result, $tag)
     {
-        $files = (isset($_POST[self::KEY_FILES]) ? $_POST[self::KEY_FILES] : []);
+        $name = $tag->name;
+        $files = isset($_POST[$name]) ? $_POST[$name] : [];
 
         // Check if we have files or if it's empty
         if (!is_array($files) || (0 == count($files) && $tag->is_required())) {
             $result->invalidate($tag, wpcf7_get_message('invalid_required'));
-
-            return $result;
-        }
-
-        /*
-        $dataTag = $this->parseTagMaxFile($tag);
-        if (count($files) > $dataTag['max-file']) {
-            $formId = $tag->get_id_option();
-            $result->invalidate($tag, $dataTag['max-file-error']);
-            return $result;
-        } */
-
-        foreach ($files as $raw) {
-            $str = sanitize_text_field($raw);
-            $pathFile = Yr3kBaseEncoder::decode($str);
-
-            if (2 == count($pathFile)) {
-                continue;
-            }
-
-            $result->invalidate($tag, wpcf7_get_message('invalid_required'));
-
-            return $result;
         }
 
         return $result;
@@ -103,19 +80,26 @@ class Yr3kUploaderFrontend
         // Get posted data
         $posts = $submission->get_posted_data();
 
-        if (!isset($posts[self::KEY_FILES]) || 0 == count($posts[self::KEY_FILES])) {
-            return $wpcf7;
-        }
+        // Find all tags of the form
+        $tags = $wpcf7->scan_form_tags();
 
         $files = [];
-        foreach ($posts[self::KEY_FILES] as $raw) {
-            $pathFile = Yr3kBaseEncoder::decode($raw);
+        foreach ($tags as $tag) {
+            if ($tag->basetype !== 'upload_image') {
+                continue;
+            }
 
-            $file = implode('/', $pathFile);
+            if (!isset($posts[$tag->name]) || 0 === count($posts[$tag->name])) {
+                return $wpcf7;
+            }
 
-            $fullPath = path_join(YR3K_UPLOAD_TEMP_DIR, $file);
-            $files[] = $fullPath;
-            $submission->add_uploaded_file($pathFile[1], $fullPath);
+            foreach ($posts[$tag->name] as $file) {
+                $fullPath = path_join(YR3K_UPLOAD_TEMP_DIR, $file);
+                $files[] = $fullPath;
+
+                $splitFile = explode('/', $file);
+                $submission->add_uploaded_file($splitFile[1], $fullPath);
+            }
         }
 
         // Prop email
@@ -170,7 +154,7 @@ class Yr3kUploaderFrontend
 
         $atts['aria-invalid'] = $validation_error ? 'true' : 'false';
         $atts['type'] = 'file';
-        $atts['name'] = $tag->name;
+        $atts['data-name'] = $tag->name;
 
         $dataTag = $this->parseTagMaxFile($tag);
 

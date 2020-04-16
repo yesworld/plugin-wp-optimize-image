@@ -68,11 +68,10 @@ class Yr3kUploaderApi
                 return;
             }
 
-            $key = $randomFolder.'||'.str_replace('/', '-', $filename);
-
             $json[] = [
                 'key' => $file['key'],
-                'value' => Yr3kBaseEncoder::encode($key),
+                'temp' => $randomFolder,
+                'value' => str_replace('/', '-', $filename),
             ];
 
             chmod($new_file, 0644);
@@ -87,24 +86,14 @@ class Yr3kUploaderApi
      */
     public function delete()
     {
-        if (!isset($_POST['key']) || empty($_POST['key'])) {
+        if (!isset($_POST['file']) || empty($_POST['file'])) {
             wp_send_json_error(wpcf7_get_message('invalid_required'));
 
             return;
         }
 
-        $key = sanitize_text_field($_POST['key']);
-        $pathFile = Yr3kBaseEncoder::decode($key);
-        if (2 != count($pathFile)) {
-            wp_send_json_error(wpcf7_get_message('invalid_required'));
-
-            return;
-        }
-
-        $file_path = path_join(
-            YR3K_UPLOAD_TEMP_DIR,
-            implode('/', $pathFile)
-        );
+        $pathFile = sanitize_text_field($_POST['file']);
+        $file_path = path_join(YR3K_UPLOAD_TEMP_DIR, $pathFile);
 
         if (!file_exists($file_path)) {
             wp_send_json_error(wpcf7_get_message('invalid_required'));
