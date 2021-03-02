@@ -20,10 +20,11 @@ jQuery(document).ready(function($){
       maxHeight: 1920,
       resize: true,
       throwIfSizeNotReached: false,
+      autoRotate: true,
 
       templatePreview: '',
       templateDndArea: '',
-    }, options);
+    }, options)
 
     var MAXFILE = +this.attr('max-file')
     var NAME_TAG = $(this).data('name')

@@ -3,8 +3,11 @@ echo '<div class="wrap">';
 echo '<h1>'; ?><?php echo esc_html(__('Images Optimize & Upload - Settings', YR3K_UPLOAD_REGISTRATION_NAME)); ?><?php echo '</h1>';
 echo '<form method="post" action="options.php">';
 
+$htmlAttrSelected = 'selected="selected"';
+
 $selectedResize = get_option('yr-images-optimize-upload-resize', true);
 $throwIfSizeNotReached = get_option('yr-images-optimize-upload-throwIfSizeNotReached');
+$autoRotate = get_option('yr-images-optimize-upload-autoRotate', 1);
 
 $templatePreview = esc_html(get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()));
 $templateDndArea = esc_html(get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()));
@@ -66,8 +69,8 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
     <th scope="row"><label for="yr-images-optimize-upload-resize"><?php echo esc_html(__('Resize', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
       <td>
         <select name="yr-images-optimize-upload-resize" id="yr-images-optimize-upload-resize">
-          <option value="1" <?php echo (1 == $selectedResize) ? 'selected="selected"' : ''; ?>><?php echo esc_html(__('Yes', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
-          <option value="0" <?php echo (0 == $selectedResize) ? 'selected="selected"' : ''; ?>><?php echo esc_html(__('No', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
+          <option value="1" <?php echo (1 == $selectedResize) ? $htmlAttrSelected : ''; ?>><?php echo esc_html(__('Yes', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
+          <option value="0" <?php echo (0 == $selectedResize) ? $htmlAttrSelected : ''; ?>><?php echo esc_html(__('No', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
         </select>
         <p class="description"><?php echo esc_html(__('Whether the image should be resized to within the bounds set by Maximum Width and Maximum Height (maintains the aspect ratio).', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
       </td>
@@ -76,8 +79,8 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
     <th scope="row"><label for="yr-images-optimize-upload-throwIfSizeNotReached"><?php echo esc_html(__('Show Errors in Browser Console', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
       <td>
         <select name="yr-images-optimize-upload-throwIfSizeNotReached" id="yr-images-optimize-upload-throwIfSizeNotReached">
-          <option value="0" <?php echo (0 == $throwIfSizeNotReached) ? 'selected="selected"' : ''; ?>><?php echo esc_html(__('No', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
-          <option value="1" <?php echo (1 == $throwIfSizeNotReached) ? 'selected="selected"' : ''; ?>><?php echo esc_html(__('Yes', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
+          <option value="0" <?php echo (0 == $throwIfSizeNotReached) ? $htmlAttrSelected : ''; ?>><?php echo esc_html(__('No', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
+          <option value="1" <?php echo (1 == $throwIfSizeNotReached) ? $htmlAttrSelected : ''; ?>><?php echo esc_html(__('Yes', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
         </select>
         <p class="description"><?php echo esc_html(__('Whether to throw an Error if the Desired Output File Size is not reached.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
       </td>

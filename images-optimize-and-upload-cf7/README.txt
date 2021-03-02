@@ -2,8 +2,8 @@
 Contributors: yesworld, bruklig
 Tags: image, compression, optimization, contact form 7, ajax uploader, drag and drop, multiple file, upload, contact form 7 uploader
 Requires at least: 5.2.2
-Tested up to: 5.4
-Stable tag: 2.1.0
+Tested up to: 5.6.2
+Stable tag: 2.1.1
 Requires PHP: 5.2
 License: GNU GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -59,6 +59,10 @@ To install this plugin see below:
 3. Drag-n-Drop Field and File Attachment - Front End
 
 == Changelog ==
+
+= 2.1.1 =
+Added an option AutoRotate
+Upgraded the plugin https://github.com/davejm/client-compress
 
 = 2.1.0 =
 Fixed Contact Form CFDB7 integration

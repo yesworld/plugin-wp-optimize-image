@@ -207,6 +207,7 @@ class Yr3kUploaderFrontend
         $maxHeight = get_option('yr-images-optimize-upload-maxHeight');
         $resize = get_option('yr-images-optimize-upload-resize');
         $throwIfSizeNotReached = get_option('yr-images-optimize-upload-throwIfSizeNotReached');
+        $autoRotate = get_option('yr-images-optimize-upload-autoRotate', 1);
 
         wp_localize_script(
             self::NAME_HANDLE,
@@ -221,6 +222,7 @@ class Yr3kUploaderFrontend
                 'maxHeight' => $maxHeight ? $maxHeight : 1920,
                 'resize' => $resize ? $resize : 1,
                 'throwIfSizeNotReached' => $throwIfSizeNotReached ? $throwIfSizeNotReached : 0,
+                'autoRotate' => $autoRotate,
                 'formatFile' => YR3K_UPLOAD_TYPE_FILES,
                 'templatePreview' => get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()),
                 'templateDndArea' => get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()),
