@@ -18,7 +18,7 @@
 - Attach compressed files to emails
 - Adapted to mobile design
 - Browser compatability
-- Automatically removes all temp files from the server after sending the form
+- Remove or save all temp files from the server after sending the form
 - Supports Google Chrome, Mozilla Firefox, Microsoft Edge. Not tested with old versions of Microsoft Internet Explorer.
 
 #### Limitations
