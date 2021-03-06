@@ -17,6 +17,7 @@ define('YR3K_UPLOAD_TYPE_FILES', 'png|jpg|jpeg|gif|bmp');
 
 $upload_dir = wp_upload_dir();
 define('YR3K_UPLOAD_TEMP_DIR', path_join($upload_dir['basedir'], 'wpcf7_upload_image'));
+define('YR3K_UPLOAD_BASEURL', path_join($upload_dir['baseurl'], 'wpcf7_upload_image'));
 
 // Array of error message.
 define('YR3K_UPLOAD_ERRORS', [

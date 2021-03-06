@@ -9,6 +9,7 @@ class Yr3kUploaderFrontend
         add_action('wpcf7_init', [$this, 'generate_tag_to_html']);
 
         // Hook before/after for mail cf7
+        add_filter('wpcf7_posted_data', [$this, 'form_post_data'], 8, 1);
         add_action('wpcf7_before_send_mail', [$this, 'before_send_mail'], 9, 1);
         add_action('wpcf7_mail_sent', [$this, 'after_mail_sent'], 100);
 
@@ -66,6 +67,34 @@ class Yr3kUploaderFrontend
         return $wpcf7;
     }
 
+    // Modify $posted_data for the plugin: Contact Form CFDB7
+    public function form_post_data($posted_data)
+    {
+        /** @var WPCF7_Submission $submission */
+        $submission = WPCF7_Submission::get_instance();
+
+        $wpcf7 = $submission->get_contact_form();
+
+        /** @var WPCF7_FormTag[] $tags */
+        $tags = $wpcf7->scan_form_tags(); // Find all tags of the form
+
+        foreach ($tags as $tag) {
+            if ($tag->basetype !== 'upload_image') {
+                continue;
+            }
+
+            if (!isset($posted_data[$tag->name]) || 0 === count($posted_data[$tag->name])) {
+                break;
+            }
+
+            foreach ($posted_data[$tag->name] as $key => $file) {
+                $posted_data[$tag->name][$key] = path_join(YR3K_UPLOAD_BASEURL, $file);
+            }
+        }
+
+        return $posted_data;
+    }
+
     /**
      * Attach files to the form.
      *
@@ -75,9 +104,10 @@ class Yr3kUploaderFrontend
      */
     public function before_send_mail(WPCF7_ContactForm $wpcf7)
     {
+        /** @var WPCF7_Submission $submission */
         $submission = WPCF7_Submission::get_instance();
 
-        // Get posted data
+        // Get post data
         $posts = $submission->get_posted_data();
 
         // Find all tags of the form
@@ -96,9 +126,6 @@ class Yr3kUploaderFrontend
             foreach ($posts[$tag->name] as $file) {
                 $fullPath = path_join(YR3K_UPLOAD_TEMP_DIR, $file);
                 $files[] = $fullPath;
-
-                $splitFile = explode('/', $file);
-                $submission->add_uploaded_file($splitFile[1], $fullPath);
             }
         }
 
