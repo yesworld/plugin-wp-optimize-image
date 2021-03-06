@@ -86,13 +86,13 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
       </td>
   </tr>
   <tr valign="top">
-    <th scope="row"><label for="yr-images-optimize-upload-removeFileAfterSend"><?php echo esc_html(__('removeFileAfterSend', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
+    <th scope="row"><label for="yr-images-optimize-upload-removeFileAfterSend"><?php echo esc_html(__('Remove Temp Files from Server', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
       <td>
         <select name="yr-images-optimize-upload-removeFileAfterSend" id="yr-images-optimize-upload-removeFileAfterSend">
           <option value="0" <?php echo (0 == $removeFileAfterSend) ? $htmlAttrSelected : ''; ?>><?php echo esc_html(__('No', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
           <option value="1" <?php echo (1 == $removeFileAfterSend) ? $htmlAttrSelected : ''; ?>><?php echo esc_html(__('Yes', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
         </select>
-        <p class="description"><?php echo esc_html(__('Descr for example plugin - Contact Form CFDB7', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
+        <p class="description"><?php echo esc_html(__('Whether the temporary files should be removed or saved on the server. If you want to keep the files on the server, use Contact Form 7 Database Addon – CFDB7 to access them.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
       </td>
   </tr>
   <tr>
