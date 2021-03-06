@@ -7,7 +7,7 @@ $htmlAttrSelected = 'selected="selected"';
 
 $selectedResize = get_option('yr-images-optimize-upload-resize', true);
 $throwIfSizeNotReached = get_option('yr-images-optimize-upload-throwIfSizeNotReached');
-$autoRotate = get_option('yr-images-optimize-upload-autoRotate', 1);
+$removeFileAfterSend = get_option('yr-images-optimize-upload-removeFileAfterSend', 1);
 
 $templatePreview = esc_html(get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()));
 $templateDndArea = esc_html(get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()));
@@ -83,6 +83,16 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
           <option value="1" <?php echo (1 == $throwIfSizeNotReached) ? $htmlAttrSelected : ''; ?>><?php echo esc_html(__('Yes', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
         </select>
         <p class="description"><?php echo esc_html(__('Whether to throw an Error if the Desired Output File Size is not reached.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
+      </td>
+  </tr>
+  <tr valign="top">
+    <th scope="row"><label for="yr-images-optimize-upload-removeFileAfterSend"><?php echo esc_html(__('removeFileAfterSend', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
+      <td>
+        <select name="yr-images-optimize-upload-removeFileAfterSend" id="yr-images-optimize-upload-removeFileAfterSend">
+          <option value="0" <?php echo (0 == $removeFileAfterSend) ? $htmlAttrSelected : ''; ?>><?php echo esc_html(__('No', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
+          <option value="1" <?php echo (1 == $removeFileAfterSend) ? $htmlAttrSelected : ''; ?>><?php echo esc_html(__('Yes', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
+        </select>
+        <p class="description"><?php echo esc_html(__('Descr for example plugin - Contact Form CFDB7', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
       </td>
   </tr>
   <tr>

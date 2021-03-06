@@ -9,7 +9,7 @@ class Yr3kUploaderFrontend
         add_action('wpcf7_init', [$this, 'generate_tag_to_html']);
 
         // Hook before/after for mail cf7
-        add_filter('wpcf7_posted_data', [$this, 'form_post_data'], 8, 1);
+        add_filter('wpcf7_posted_data_'.YR3K_UPLOAD_SHORTCODE, [$this, 'change_post_data'], 8, 1);
         add_action('wpcf7_before_send_mail', [$this, 'before_send_mail'], 9, 1);
         add_action('wpcf7_mail_sent', [$this, 'after_mail_sent'], 100);
 
@@ -51,7 +51,7 @@ class Yr3kUploaderFrontend
         $bool = $this->isOptimizeFiled($wpcf7->scan_form_tags());
         $wpcf7->message('mail_sent_ok');
 
-        if (!$bool) {
+        if (!$bool || 0 == get_option('yr-images-optimize-upload-removeFileAfterSend', 1)) {
             return $wpcf7;
         }
 
@@ -67,32 +67,14 @@ class Yr3kUploaderFrontend
         return $wpcf7;
     }
 
-    // Modify $posted_data for the plugin: Contact Form CFDB7
-    public function form_post_data($posted_data)
+    // Modify $files for the plugin: Contact Form CFDB7
+    public function change_post_data($files)
     {
-        /** @var WPCF7_Submission $submission */
-        $submission = WPCF7_Submission::get_instance();
-
-        $wpcf7 = $submission->get_contact_form();
-
-        /** @var WPCF7_FormTag[] $tags */
-        $tags = $wpcf7->scan_form_tags(); // Find all tags of the form
-
-        foreach ($tags as $tag) {
-            if ($tag->basetype !== 'upload_image') {
-                continue;
-            }
-
-            if (!isset($posted_data[$tag->name]) || 0 === count($posted_data[$tag->name])) {
-                break;
-            }
-
-            foreach ($posted_data[$tag->name] as $key => $file) {
-                $posted_data[$tag->name][$key] = path_join(YR3K_UPLOAD_BASEURL, $file);
-            }
+        foreach ($files as $key => $file) {
+            $files[$key] = path_join(YR3K_UPLOAD_BASEURL, $file);
         }
 
-        return $posted_data;
+        return $files;
     }
 
     /**
@@ -115,7 +97,7 @@ class Yr3kUploaderFrontend
 
         $files = [];
         foreach ($tags as $tag) {
-            if ($tag->basetype !== 'upload_image') {
+            if ($tag->basetype !== YR3K_UPLOAD_SHORTCODE) {
                 continue;
             }
 
@@ -124,7 +106,8 @@ class Yr3kUploaderFrontend
             }
 
             foreach ($posts[$tag->name] as $file) {
-                $fullPath = path_join(YR3K_UPLOAD_TEMP_DIR, $file);
+                $shotPath = explode('wpcf7_upload_image/', $file)[1];
+                $fullPath = path_join(YR3K_UPLOAD_TEMP_DIR, $shotPath);
                 $files[] = $fullPath;
             }
         }
@@ -234,7 +217,6 @@ class Yr3kUploaderFrontend
         $maxHeight = get_option('yr-images-optimize-upload-maxHeight');
         $resize = get_option('yr-images-optimize-upload-resize');
         $throwIfSizeNotReached = get_option('yr-images-optimize-upload-throwIfSizeNotReached');
-        $autoRotate = get_option('yr-images-optimize-upload-autoRotate', 1);
 
         wp_localize_script(
             self::NAME_HANDLE,
@@ -249,7 +231,6 @@ class Yr3kUploaderFrontend
                 'maxHeight' => $maxHeight ? $maxHeight : 1920,
                 'resize' => $resize ? $resize : 1,
                 'throwIfSizeNotReached' => $throwIfSizeNotReached ? $throwIfSizeNotReached : 0,
-                'autoRotate' => $autoRotate,
                 'formatFile' => YR3K_UPLOAD_TYPE_FILES,
                 'templatePreview' => get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()),
                 'templateDndArea' => get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()),
