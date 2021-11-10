@@ -70,6 +70,10 @@ class Yr3kUploaderFrontend
     // Modify $files for the plugin: Contact Form CFDB7
     public function change_post_data($files)
     {
+        if (!is_array($files)) {
+            return;
+        }
+
         foreach ($files as $key => $file) {
             $files[$key] = path_join(YR3K_UPLOAD_BASEURL, $file);
         }

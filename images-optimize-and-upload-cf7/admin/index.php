@@ -83,7 +83,7 @@ class Yr3kUploaderAdmin
      */
     public function general_admin_notice()
     {
-        if ('optimizer-3000' == $_GET['page'] && isset($_REQUEST['settings-updated'])) {
+        if (isset($_GET['page']) && 'optimizer-3000' == $_GET['page'] && isset($_REQUEST['settings-updated'])) {
             echo '<div class="notice notice-success is-dismissible"><p>'.__('Settings saved.').'</p></div>';
         }
     }

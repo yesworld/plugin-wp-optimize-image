@@ -2,8 +2,8 @@
 Contributors: yesworld, bruklig
 Tags: image, compression, optimization, contact form 7, ajax uploader, drag and drop, multiple file, upload, contact form 7 uploader
 Requires at least: 5.2.2
-Tested up to: 5.7
-Stable tag: 2.1.2
+Tested up to: 5.8.1
+Stable tag: 2.1.3
 Requires PHP: 5.2
 License: GNU GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -59,6 +59,9 @@ To install this plugin see below:
 3. Drag-n-Drop Field and File Attachment - Front End
 
 == Changelog ==
+
+= 2.1.3 =
+Fix work with other upload plugins.
 
 = 2.1.2 =
 Added an option to remove or save temp files
