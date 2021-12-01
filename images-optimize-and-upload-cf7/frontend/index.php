@@ -3,6 +3,7 @@
 class Yr3kUploaderFrontend
 {
     const NAME_HANDLE = 'yr3k-optimizer-3000';
+    const UPLOAD_FOLDER = 'wpcf7_upload_image';
 
     public function __construct()
     {
@@ -57,7 +58,7 @@ class Yr3kUploaderFrontend
 
         $mail = $wpcf7->prop('mail');
         foreach (explode("\n", $mail['attachments']) as $file) {
-            if (!file_exists($file)) {
+            if (!file_exists($file) || strpos($file, self::UPLOAD_FOLDER) === false) {
                 continue;
             }
 
@@ -110,10 +111,19 @@ class Yr3kUploaderFrontend
             }
 
             foreach ($posts[$tag->name] as $file) {
-                $shotPath = explode('wpcf7_upload_image/', $file)[1];
+                $shotPath = explode(self::UPLOAD_FOLDER . '/', $file)[1];
                 $fullPath = path_join(YR3K_UPLOAD_TEMP_DIR, $shotPath);
                 $files[] = $fullPath;
             }
+        }
+
+        // Migrated existing files from other plugins
+        foreach ($submission->uploaded_files() as $file) {
+            if (!isset($file[0])) {
+                continue;
+            }
+
+            $files[] = current($file);
         }
 
         // Prop email

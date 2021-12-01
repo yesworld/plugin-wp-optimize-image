@@ -2,12 +2,12 @@
 
 class Yr3kUploaderButtonTagCF7
 {
-    protected $position = 55;
+    private const BUTTON_POSITION = 55;
 
     public function __construct()
     {
         // add bottom tag to cf7
-        add_action('wpcf7_admin_init', [$this, 'addButton'], $this->position);
+        add_action('wpcf7_admin_init', [$this, 'addButton'], self::BUTTON_POSITION);
     }
 
     /**
@@ -48,6 +48,7 @@ class Yr3kUploaderButtonTagCF7
 
 class Yr3kUploaderAdmin
 {
+    private const FIELD_NAME_SHOW_NOTICE = 'yr-images-optimize-upload-do-not-show-rating-tip';
     private $register = [
         'yr-images-optimize-upload-targetSize',
         'yr-images-optimize-upload-quality',
@@ -61,21 +62,24 @@ class Yr3kUploaderAdmin
         'yr-images-optimize-upload-maxFiles',
         'yr-images-optimize-upload-template-dnd',
         'yr-images-optimize-upload-template',
+        self::FIELD_NAME_SHOW_NOTICE,
     ];
 
     public function __construct()
     {
         // init action
         add_action('admin_menu', [$this, 'addButton']);
-        add_action('admin_init', [$this, 'register_settings']);
+        add_action('admin_init', [$this, 'admin_init']);
 
         // add the Settings link to the plugin activation form
-        add_filter('plugin_action_links_'.YR3K_UPLOAD_REGISTRATION_NAME.'/index.php', [$this, 'addLink']);
+        add_filter('plugin_action_links_' . YR3K_UPLOAD_BASENAME, [$this, 'addLink']);
 
-        // Hook activation plugin
-        register_deactivation_hook(YR3K_UPLOAD_PATH.'index.php', [$this, 'deactivate']);
+        // Hook activation/deactivation plugin
+        register_activation_hook(YR3K_UPLOAD_BASENAME, [$this, 'activate']);
+        register_deactivation_hook(YR3K_UPLOAD_BASENAME, [$this, 'deactivate']);
 
         add_action('admin_notices', [$this, 'general_admin_notice']);
+        add_action('admin_notices', [$this, 'rating_notice']);
     }
 
     /**
@@ -86,6 +90,24 @@ class Yr3kUploaderAdmin
         if (isset($_GET['page']) && 'optimizer-3000' == $_GET['page'] && isset($_REQUEST['settings-updated'])) {
             echo '<div class="notice notice-success is-dismissible"><p>'.__('Settings saved.').'</p></div>';
         }
+    }
+
+    /**
+     * Display admin notice on settings page about rating.
+     */
+    public function rating_notice()
+    {
+        $ratingOption = get_option('yr-images-optimize-upload-do-not-show-rating-tip', null);
+
+        if ($ratingOption !== null && time() < $ratingOption) {
+            return;
+        }
+
+        $queryAdminUrl = get_admin_url();
+        $queryAdminUrl .= strpos($queryAdminUrl,'?') !== false ? '&' : '?';
+        $queryAdminUrl .= 'yr_rating_notice=';
+
+        require_once YR3K_UPLOAD_PATH  .'/views/form.notice.php';
     }
 
     /**
@@ -125,6 +147,8 @@ class Yr3kUploaderAdmin
         require_once YR3K_UPLOAD_PATH.'/views/form.settings.optimizer.php';
     }
 
+    public function activate() {}
+
     /**
      * Remove options from DB and folder from the Server when plugin is deactivated.
      */
@@ -156,13 +180,20 @@ class Yr3kUploaderAdmin
         return rmdir($dir);
     }
 
-    /**
-     * Register settings for DB.
-     */
-    public function register_settings()
+
+    public function admin_init()
     {
         foreach ($this->register as $name) {
             register_setting(YR3K_UPLOAD_REGISTRATION_NAME, $name);
         }
+
+        if (!isset($_GET['yr_rating_notice'])) {
+            return;
+        }
+
+        $rate = intval($_GET['yr_rating_notice']);
+        $time = $rate === 1 ? '+7 days' : '+3 years';
+
+        update_option(self::FIELD_NAME_SHOW_NOTICE, strtotime($time));
     }
 }

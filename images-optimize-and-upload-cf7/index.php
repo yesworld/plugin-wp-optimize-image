@@ -10,8 +10,9 @@
  */
 define('YR3K_UPLOAD_VERSION', '2.1.3');
 define('YR3K_UPLOAD_REQUIRED_WP_VERSION', '4.9');
+define('YR3K_UPLOAD_BASENAME', plugin_basename(__FILE__));
 define('YR3K_UPLOAD_PATH', plugin_dir_path(__FILE__));
-define('YR3K_UPLOAD_REGISTRATION_NAME', dirname(plugin_basename(__FILE__)));
+define('YR3K_UPLOAD_REGISTRATION_NAME', dirname(YR3K_UPLOAD_BASENAME));
 define('YR3K_UPLOAD_SHORTCODE', 'upload_image');
 define('YR3K_UPLOAD_TYPE_FILES', 'png|jpg|jpeg|gif|bmp');
 
