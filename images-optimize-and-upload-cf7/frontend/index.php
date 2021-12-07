@@ -190,7 +190,8 @@ class Yr3kUploaderFrontend
         return $this->template(
             sanitize_html_class($tag->name),
             wpcf7_format_atts($atts),
-            $validation_error
+            $validation_error, 
+			str_replace('|',',.','.'.YR3K_UPLOAD_TYPE_FILES)//кастомные типы файлов из файла настроек index.php
         );
     }
 
@@ -231,6 +232,7 @@ class Yr3kUploaderFrontend
         $maxHeight = get_option('yr-images-optimize-upload-maxHeight');
         $resize = get_option('yr-images-optimize-upload-resize');
         $throwIfSizeNotReached = get_option('yr-images-optimize-upload-throwIfSizeNotReached');
+		$sizefiles=get_option('yr-images-optimize-upload-sizefiles');
 
         wp_localize_script(
             self::NAME_HANDLE,
@@ -246,12 +248,15 @@ class Yr3kUploaderFrontend
                 'resize' => $resize ? $resize : 1,
                 'throwIfSizeNotReached' => $throwIfSizeNotReached ? $throwIfSizeNotReached : 0,
                 'formatFile' => YR3K_UPLOAD_TYPE_FILES,
+				'sizefiles' => $sizefiles ? $sizefiles : 15,
                 'templatePreview' => get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()),
                 'templateDndArea' => get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()),
                 'language' => [
                     'info_file_origin' => __('Original size', YR3K_UPLOAD_REGISTRATION_NAME),
                     'info_file_compress' => __('Compressed', YR3K_UPLOAD_REGISTRATION_NAME),
                     'info_file_delete' => __('Delete', YR3K_UPLOAD_REGISTRATION_NAME),
+					'info_file_sizefiles' => __('The total files size should not exceed', YR3K_UPLOAD_REGISTRATION_NAME),
+					'info_file_uploading' => __('Uploading files...', YR3K_UPLOAD_REGISTRATION_NAME),
                     'wrong_format' => __('Wrong file format', YR3K_UPLOAD_REGISTRATION_NAME),
                 ],
             ]
@@ -275,7 +280,7 @@ class Yr3kUploaderFrontend
         if (!$maxFiles) {
             $maxFiles = get_option('yr-images-optimize-upload-maxFiles', 3);
         }
-        $textError = _n('Maximum %d image is allowed.', 'Maximum %d images is allowed.', $maxFiles, YR3K_UPLOAD_REGISTRATION_NAME);
+        $textError = _n('Maximum %d file is allowed.', 'Maximum %d files is allowed.', $maxFiles, YR3K_UPLOAD_REGISTRATION_NAME);
 
         return [
             'max-file' => (int) $maxFiles,
@@ -310,10 +315,10 @@ class Yr3kUploaderFrontend
      *
      * @return string
      */
-    protected function template($name, $attrs, $error)
+    protected function template($name, $attrs, $error, $typefiles)
     {
         $template = '<span class="wpcf7-form-control-wrap %1$s wpcf7-images-optimize-upload-wrap">'
-            .'<input %2$s multiple="multiple" accept="image/png,image/jpeg"/>'
+            .'<input %2$s multiple="multiple" accept="'.$typefiles.'"/>'
             .'%3$s'
             .'</span>'
         ;
