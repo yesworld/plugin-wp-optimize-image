@@ -86,6 +86,20 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
       </td>
   </tr>
   <tr>
+    <th scope="row"><label for="yr-images-optimize-upload-formatfiles"><?php echo esc_html(__('Formats of uploaded files', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
+      <td>
+		<input name="yr-images-optimize-upload-formatfiles" id="yr-images-optimize-upload-formatfiles" type="text" placeholder="<?php echo esc_html(__('Default:', YR3K_UPLOAD_REGISTRATION_NAME)); ?> png|jpg|jpeg|gif|bmp" value="<?php echo esc_attr(get_option('yr-images-optimize-upload-formatfiles')); ?>">
+        <p class="description"><?php echo esc_html(__('You can allow other files to be uploaded. List their formats via | (For example: docx|pptx|xlsx|mp3|wav, etc.). Attention! The plugin optimizes only images.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
+      </td>
+  </tr>
+  <tr>
+    <th scope="row"><label for="yr-images-optimize-upload-sizefiles"><?php echo esc_html(__('Limit on the total size of files sent', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
+      <td>
+		<input name="yr-images-optimize-upload-sizefiles" id="yr-images-optimize-upload-sizefiles" type="number" placeholder="<?php echo esc_html(__('Default:', YR3K_UPLOAD_REGISTRATION_NAME)); ?> 15" value="<?php echo esc_attr(get_option('yr-images-optimize-upload-sizefiles')); ?>">MB
+        <p class="description"><?php echo esc_html(__('The maximum size of files sent via the form. Default: 15 MB. Do not use a large size, as there may be restrictions on the size of uploaded files set in the settings of WP, PHP and the mail service.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
+      </td>
+  </tr>
+  <tr>			   
     <th scope="row"><label for="yr-images-optimize-upload-removeFileAfterSend"><?php echo esc_html(__('Remove Temp Files from Server', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
       <td>
         <select name="yr-images-optimize-upload-removeFileAfterSend" id="yr-images-optimize-upload-removeFileAfterSend">
@@ -138,7 +152,7 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
 <h2><?php echo esc_html(__('Limitations', YR3K_UPLOAD_REGISTRATION_NAME)); ?></h2>
 <h4><?php echo esc_html(__('There are several limitations for this plugin:', YR3K_UPLOAD_REGISTRATION_NAME)); ?></h4>
 <ul>
-  <li><?php echo esc_html(__('* This plugin supports the following file formats: PNG, JPG, JPEG, GIF, BMP.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></li>
+  <li><?php echo esc_html(__('* This plugin optimizes images of the following file formats: PNG, JPG, JPEG, GIF, BMP.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></li>
   <li><?php echo esc_html(__('* When working with animated GIF, the compressed image will no longer animate.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></li>
   <li><?php echo esc_html(__('* When working with PNG with transparent background, the compressed image will lose transparency and result in black background.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></li>
 </ul>
