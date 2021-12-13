@@ -1,15 +1,13 @@
 jQuery(document).ready(function($){
 
   $.fn.Optimizer3k = function(options) {
-    var language = YR3K_UPLOADER_OPTIONS.language;
-
     var setting = $.extend({
-      info_file_origin: language.info_file_origin,
-      info_file_compress: language.info_file_compress,
-      wrong_format: language.wrong_format,
-      info_file_delete: language.info_file_delete,
-	  info_file_sizefiles: language.info_file_sizefiles,
-	  info_file_uploading: language.info_file_uploading,
+      info_file_origin: YR3K_UPLOADER_OPTIONS.language.info_file_origin,
+      info_file_compress: YR3K_UPLOADER_OPTIONS.language.info_file_compress,
+      info_file_wrong_format: YR3K_UPLOADER_OPTIONS.language.info_file_wrong_format,
+      info_file_delete: YR3K_UPLOADER_OPTIONS.language.info_file_delete,
+	  info_file_limit_files_size: YR3K_UPLOADER_OPTIONS.language.info_file_limit_files_size,
+	  info_file_uploading: YR3K_UPLOADER_OPTIONS.language.info_file_uploading,
 
       ajax_url: YR3K_UPLOADER_OPTIONS.ajax_url,
       formatFile: new RegExp('\.('+ YR3K_UPLOADER_OPTIONS.formatFile +')$', 'i'),
@@ -23,24 +21,23 @@ jQuery(document).ready(function($){
       resize: true,
       throwIfSizeNotReached: false,
       autoRotate: true,
-	  sizefiles: 15,
+	  limitFilesSize: 15,
 
       templatePreview: '',
       templateDndArea: '',
     }, options)
 
-    var MAXFILE = +this.attr('max-file')
-    var NAME_TAG = $(this).data('name')
-    var txtErrorMaxFiles = this.attr('max-file-error')
-    var txtErrorFormat = setting.wrong_format
+    const _THIS = this
+    const LIMIT_MAX_FILES = +this.attr('max-file')
+    const NAME_TAG = $(this).data('name')
+    const txtErrorMaxFiles = this.attr('max-file-error')
+    const txtErrorFormat = setting.info_file_wrong_format
 
-    var th = this
     var ID = this.attr('id') ? this.attr('id') : 0
 
     var countImages = 0;
-	var sizef = 0;
+	var currentFileSize = 0;
 
-    var bodyHTML = '<div class="images-optimize-upload-handler"><div class="images-optimize-upload-container"><div class="images-optimize-upload-inner">' + setting.templateDndArea + '</div></div></div>';
     this.wrapAll('<div class="images-optimize-upload-wrapper"></div>');
 
     var $dropZone = this.parents('.images-optimize-upload-wrapper');
@@ -49,6 +46,7 @@ jQuery(document).ready(function($){
     var $form = this.parents("form");
     var $btnSubmit = $('input.wpcf7-submit', $form);
 
+    var bodyHTML = '<div class="images-optimize-upload-handler"><div class="images-optimize-upload-container"><div class="images-optimize-upload-inner">' + setting.templateDndArea + '</div></div></div>';
     this.after(bodyHTML);
 
     var $list = $('<ul class="list"></ul>');
@@ -66,41 +64,42 @@ jQuery(document).ready(function($){
           e.preventDefault();
           e.stopPropagation();
         })
-        .on("dragover dragenter", function(a) {
+        .on("dragover dragenter", function() {
           $(this).addClass("hover")
         })
-        .on("dragleave dragend drop", function(a) {
+        .on("dragleave dragend drop", function() {
           $(this).removeClass("hover")
         })
         .on("drop", function(e) {
-          upload(e.originalEvent.dataTransfer.files)
+          callbackUploadFiles(e.originalEvent.dataTransfer.files)
         })
       ;
 
       $dropZone.find('a.images-optimize-upload-button').on("click", function(e) {
         e.preventDefault();
-        th.trigger('click')
+        _THIS.trigger('click')
       });
 
       // click button to load images
-      th.on("change", function(e) {
-        upload(this.files)
+      _THIS.on("change", function() {
+        callbackUploadFiles(this.files)
       });
 
       // click to remove image
       $list.on('click', 'li del', function(e){
         var $li = $(this).parent();
-		
-		sizef=sizef - $li.find('.sizefile').text()	
-		
+
+		currentFileSize=currentFileSize - $li.find('.sizefile').text()
+
         deleteImage($li.find('input[type="hidden"]').val())
+
         $li.remove();
         countImages--
         errorHandler() //hide error
       });
 
       // callback success send
-      document.addEventListener( 'wpcf7mailsent', function( event ) {
+      document.addEventListener( 'wpcf7mailsent', function() {
         $list.empty();
         errorHandler() //hide error
         countImages = 0
@@ -108,113 +107,112 @@ jQuery(document).ready(function($){
     }
 
     /**
-     * Uploading images
-     * @param images
+     * Uploading files
      */
-    function upload(images) {
-      if (!images.length) return;
+    async function callbackUploadFiles(files) {
+      if (files.length === 0) return;
 
-      if (countImages + images.length > MAXFILE){
+      if (countImages + files.length > LIMIT_MAX_FILES){
         errorHandler(txtErrorMaxFiles) //show error
-        th.get(0).value = ''
+        _THIS.get(0).value = ''
         return;
       }
 
       // checks files
-	 var imm = images;
-var imagefiles=[];//картинки закинем в отдельный массив для массовой обработки
-		      var formData = new FormData
+      var imagefiles=[];//картинки закинем в отдельный массив для массовой обработки
       // temporarily disabled the form
-      disableForm(true);  
+      disableForm(true);
       errorHandler() //hide error
-	  
-          for (var i = 0; imm.length > i; i++) {
 
-			//Загружаем файл в браузер
-			var otherfiles=imm[i];
-			//захватываем имя, тип, размер
-			var namefile = otherfiles.name;
-			var formatf=otherfiles.type;
-			var sizefile=otherfiles.size / 1024 / 1024;
-			var imgf='';
+      for (let i = 0; files.length > i; i++) {
+        const file = files[i];
 
-			        // Если форматов нет в списке разрешенных - завершаем выполнение и выводим ошибку
+        var namefile = file.name;
+        var formatf=file.type;
+        var sizefile=file.size / 1024 / 1024;
+        var imgf='';
+
+        // Если форматов нет в списке разрешенных - завершаем выполнение и выводим ошибку
         if (!namefile.match(setting.formatFile)) {
 			errorHandler(txtErrorFormat) // show error
 			emptyUpload()
 			disableForm(false);
-			otherfiles=[];//на случай всякий обнулим
-          return false;
+            return false;
         }
-		
-		//если при обработке попалась картинка - закинем ее в отдельный массив для отдельной обработки
-		if(formatf.indexOf('image') != -1){
 
-//Картинки обрабатываем отдельно, для этого временно их кидаем в массив и забиваем пока на нее, продорлжаем смотреть следующий элемент
-			imagefiles.push(otherfiles);
+		if(formatf.indexOf('image') != -1){
+            let reds = await compressImage([file])
+            debugger
+            //Картинки обрабатываем отдельно, для этого временно их кидаем в массив и забиваем пока на нее, продорлжаем смотреть следующий элемент
+			imagefiles.push(file);
 			continue;
 
 		}else{
+            // Если файл слишком большой - выкидываем ошибку
+            if(maxsizeform(currentFileSize,sizefile)==false){return false;}
 
-		 // Если файл слишком большой - выкидываем ошибку
-		if(maxsizeform(sizef,sizefile)==false){return false;}
-		sizef = maxsizeform(sizef,sizefile);//если с весом все в порядке - добавляем к итоговому размеру и едем дальше
-					//рандомная строка, чтобы не было путаницы с файлами
+            currentFileSize = maxsizeform(currentFileSize,sizefile);//если с весом все в порядке - добавляем к итоговому размеру и едем дальше
+            //рандомная строка, чтобы не было путаницы с файлами
 			var randomString = getRandomString();
-//сопоставляем тип файла с логотипом
-switch (true) {
-    // если аудио
-    case formatf.indexOf('audio') != -1:
-imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/audio.svg">';
-        break;
-    // если видео
-    case formatf.indexOf('video') != -1:
-imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/video.svg">';
-        break;
-    // если word
-    case ((formatf.indexOf('wordprocessingml') != -1) || (formatf.indexOf('msword') != -1)):
- imgf = '<img width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/word.svg">';
-        break;
-    // если excel
-    case ((formatf.indexOf('spreadsheetml') != -1) || (formatf.indexOf('excel') != -1)):
- imgf = '<img style="padding:10px;" width="160" height="160" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/excel.svg">';
-        break;
-    // если powerpoint
-    case ((formatf.indexOf('presentation') != -1) || (formatf.indexOf('powerpoint') != -1)):
- imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/powerpoint.svg">';
-        break;
-	// если pdf
-    case formatf.indexOf('pdf') != -1:
- imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/pdf.svg">'; 
-        break;
-	// если архив
-    case formatf.indexOf('compressed') != -1:
- imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/archive.svg">'; 
-        break;
-    // иначе, выводим общую картинку	
-    default:
- imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/text.svg">';
-        break;
-}
-		  
-		  //формируем предпросмотр		  
-		  createLiHtml('', '', '', randomString, imgf, otherfiles);
+            //сопоставляем тип файла с логотипом
+            switch (true) {
+                // если аудио
+                case formatf.indexOf('audio') != -1:
+            imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/audio.svg">';
+                    break;
+                // если видео
+                case formatf.indexOf('video') != -1:
+            imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/video.svg">';
+                    break;
+                // если word
+                case ((formatf.indexOf('wordprocessingml') != -1) || (formatf.indexOf('msword') != -1)):
+            imgf = '<img width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/word.svg">';
+                   break;
+               // если excel
+               case ((formatf.indexOf('spreadsheetml') != -1) || (formatf.indexOf('excel') != -1)):
+            imgf = '<img style="padding:10px;" width="160" height="160" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/excel.svg">';
+                   break;
+               // если powerpoint
+               case ((formatf.indexOf('presentation') != -1) || (formatf.indexOf('powerpoint') != -1)):
+            imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/powerpoint.svg">';
+                   break;
+               // если pdf
+               case formatf.indexOf('pdf') != -1:
+            imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/pdf.svg">';
+                   break;
+               // если архив
+               case formatf.indexOf('compressed') != -1:
+            imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/archive.svg">';
+                   break;
+               // иначе, выводим общую картинку
+               default:
+            imgf = '<img style="padding:10px;" width="128" height="128" alt="" src="/wp-content/plugins/images-optimize-and-upload-cf7/frontend/assets/logo/text.svg">';
+                    break;
+            }
 
-		  //добавляем загруженные файлы к форме
-		    formData.append('upload-image[]', otherfiles, namefile)
+            //формируем предпросмотр
+            createLiHtml('', '', '', randomString, imgf, file);
+
+            //добавляем загруженные файлы к форме
+		    formData.append('upload-image[]', file, namefile)
             formData.append('upload-image-key[]', randomString)
-          }			
+          }
 	  }
-	  //отправляем только прочие файлы...
-		  formData.append("action", "yr_api_uploader");
-          formData.append("id", ID);
-		  send(formData)		
 
-//обработаем отдельно в новой форме картинки
-iii(imagefiles);
-		function iii(imagefiles){
-	  if (imagefiles.length != 0) {
-		  var formData = new FormData				  
+	  //отправляем только прочие файлы...
+      formData.append("action", "yr_api_uploader");
+      formData.append("id", ID);
+      send(formData)
+
+      //обработаем отдельно в новой форме картинки
+      iii(imagefiles);
+
+      function iii(imagefiles){
+
+          if (imagefiles.length == 0) {
+              return
+          }
+      const formData = new FormData
       compress
         .compress(imagefiles)
         .then((conversions) => {
@@ -224,8 +222,8 @@ iii(imagefiles);
             var photo = conversions[i].photo
             var info = conversions[i].info
 			//проверка на размер файла (проходит ли именно сжатый файл нашу проверку)
-			if(maxsizeform(sizef,info.endSizeMB)==false){return false;}
-			sizef = maxsizeform(sizef,info.endSizeMB);//если все в порядке - складываем и едем дальше
+			if(maxsizeform(currentFileSize,info.endSizeMB)==false){return false;}
+			currentFileSize = maxsizeform(currentFileSize,info.endSizeMB);//если все в порядке - складываем и едем дальше
 
             // Create an object URL which points to the photo Blob data
             const objectUrl = URL.createObjectURL(photo.data)
@@ -242,17 +240,41 @@ iii(imagefiles);
           formData.append("id", ID);
           send(formData)
       })
-	  }
 	}
 
-//если все файлы благополучно обработались - посчитаем их и запомним
-	  countImages += imm.length
+    //если все файлы благополучно обработались - посчитаем их и запомним
+	  countImages += files.length
 	  //очищаем все
 		emptyUpload()
 
-		}
-		
-		
+    }
+
+    /**
+     * @param images[]
+     * @return Promise<any[]>
+     */
+    async function compressImage(images) {
+      return new Promise((resolve) => {
+        compress
+          .compress(images)
+          .then((conversions) => {
+
+            const result = []
+            for (let i = 0; conversions.length > i; i++) {
+
+              let image = conversions[i].photo
+              image.info = conversions[i].info
+              image.id = getRandomString()
+
+              // Create an object URL which points to the photo Blob data
+              image.preview = URL.createObjectURL(image.data)
+              result.push(image)
+            }
+
+            resolve(result)
+          })
+      })
+    }
 
     /**
      * Display an error
@@ -270,8 +292,8 @@ iii(imagefiles);
      * Clear images from form
      */
     function emptyUpload() {
-      th.empty()
-      th.get(0).value = ''
+      _THIS.empty()
+      _THIS.get(0).value = ''
     }
 
     /**
@@ -300,7 +322,7 @@ iii(imagefiles);
      * @param data
      */
     function send(data) {
-errorHandler(setting.info_file_uploading) //загрузка файла
+      errorHandler(setting.info_file_uploading) //загрузка файла
       $.ajax({
         url: setting.ajax_url,
         type: 'post',
@@ -310,13 +332,13 @@ errorHandler(setting.info_file_uploading) //загрузка файла
         contentType: false,
         processData: false,
         success: function(res) {
-
           disableForm(false);
 
           if (!res.success) {
             return;
           }
-console.log(res);
+          console.log(res);
+
           for (var i=0; i < res.data.length; i++) {
             var key = res.data[i].key;
             var value = res.data[i].temp + '/' + res.data[i].value;
@@ -324,7 +346,7 @@ console.log(res);
               .append('<input type="hidden" name="' + NAME_TAG + '[]" value="' + value + '">')
               .show();
           }
-errorHandler() //error		
+          errorHandler() //error
         },
         error: function() {
           disableForm(false);
@@ -336,20 +358,20 @@ errorHandler() //error
 
     /**
      * Files size
-     * @param sizef
+     * @param currentFileSize
      * @param sizefile
      */
-	function maxsizeform(sizef,sizefile){
+	function maxsizeform(currentFileSize,sizefile){
 			//проверка на суммарный размер файлов. Если если превышает заданное значение - вывод ошибки.
-//console.log(sizefile);			
-		if (sizef + sizefile > setting.sizefiles) {
-			errorHandler(setting.info_file_sizefiles + ' ' + setting.sizefiles + 'MB') // show error
+//console.log(sizefile);
+		if (currentFileSize + sizefile > setting.limitFilesSize) {
+			errorHandler(setting.info_file_limit_files_size + ' ' + setting.limitFilesSize + 'MB') // show error
 			emptyUpload()
 			disableForm(false);
           return false;
-        } 
+        }
 		//если по размеру проходим - приплюсовываем его к итогу и его выводим
-		return sizef+=sizefile;
+		return currentFileSize+=sizefile;
   }
 
 
@@ -410,7 +432,7 @@ errorHandler() //error
 	  primg = previewImg.outerHTML;
 		}else{
 			fsize = otherfiles.size / 1024 / 1024;
-			            //Создаем макет загруженного файла: добавляем название, формат, размер и картинку загружаемого файла
+                //Создаем макет загруженного файла: добавляем название, формат, размер и картинку загружаемого файла
 			html = '<span>'+otherfiles.name+'</span><span>'+otherfiles.type+'</span><span>'+fsize.toFixed(2)+'Mb</span><del data-note="'+setting.info_file_delete+'">×</del>';
 			primg=imgf;
 		}

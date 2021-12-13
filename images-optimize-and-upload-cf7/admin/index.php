@@ -58,8 +58,8 @@ class Yr3kUploaderAdmin
         'yr-images-optimize-upload-maxHeight',
         'yr-images-optimize-upload-resize',
         'yr-images-optimize-upload-throwIfSizeNotReached',
-		'yr-images-optimize-upload-formatfiles',
-		'yr-images-optimize-upload-sizefiles',
+        'yr-images-optimize-upload-file-formats',
+        'yr-images-optimize-upload-file-size',
         'yr-images-optimize-upload-removeFileAfterSend',
         'yr-images-optimize-upload-maxFiles',
         'yr-images-optimize-upload-template-dnd',
@@ -99,7 +99,7 @@ class Yr3kUploaderAdmin
      */
     public function rating_notice()
     {
-        $ratingOption = get_option('yr-images-optimize-upload-do-not-show-rating-tip', null);
+        $ratingOption = get_option(self::FIELD_NAME_SHOW_NOTICE, null);
 
         if ($ratingOption !== null && time() < $ratingOption) {
             return;
@@ -176,7 +176,7 @@ class Yr3kUploaderAdmin
     {
         $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
-            (is_dir("$dir/$file")) ? $this->delTree("$dir/$file") : unlink("$dir/$file");
+            is_dir("$dir/$file") ? $this->delTree("$dir/$file") : unlink("$dir/$file");
         }
 
         return rmdir($dir);

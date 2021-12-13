@@ -16,7 +16,7 @@ jQuery(document).ready(function($){
       throwIfSizeNotReached: YR3K_UPLOADER_OPTIONS.throwIfSizeNotReached == 1,
       templatePreview: YR3K_UPLOADER_OPTIONS.templatePreview,
       templateDndArea: YR3K_UPLOADER_OPTIONS.templateDndArea,
-	  sizefiles: YR3K_UPLOADER_OPTIONS.sizefiles,
+	  limitFilesSize: YR3K_UPLOADER_OPTIONS.limitFilesSize,
     })
   })
 })

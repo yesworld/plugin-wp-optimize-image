@@ -197,59 +197,13 @@ msgstr ""
 "Показывать ли ошибки в консоли браузера, если размер итогового файла не был "
 "достигнут."
 
-#: views/form.settings.optimizer.php:90
-msgid "Formats of uploaded files"
-msgstr "Форматы загружаемых файлов"
-
-#: views/form.settings.optimizer.php:96
-msgid ""
-"You can allow other files to be uploaded. List their formats via | (For "
-"example: docx|pptx|xlsx|mp3|wav, etc.). Attention! The plugin optimizes only "
-"images."
-msgstr ""
-"Вы можете разрешить загрузку других файлов. Перечислите их форматы через | "
-"(Например: docx|pptx|xlsx|mp3|wav и т.д.). Внимание! Плагин оптимизирует "
-"только изображения."
-
-#: views/form.settings.optimizer.php:98
-msgid "Limit on the total size of files sent"
-msgstr "Ограничение на суммарный размер отправляемых файлов"
-
-#: views/form.settings.optimizer.php:99
-msgid ""
-"The maximum size of files sent via the form. Default: 15 MB. Do not use a "
-"large size, as there may be restrictions on the size of uploaded files set "
-"in the settings of WP, PHP and the mail service."
-msgstr ""
-"Максимальный размер файлов, отправляемых через форму. По умолчанию: 15 МБ. "
-"Не используйте большой размер, так как могут быть ограничения на размер "
-"загружаемых файлов, установленные в настройках WP, PHP и почтового сервиса."
-
-#: views/form.settings.optimizer.php:100
-msgid "Remove Temp Files from Server"
-msgstr "Удалить временные файлы с сервера"
-
-#: views/form.settings.optimizer.php:106
-msgid ""
-"Whether the temporary files should be removed or saved on the server. If you "
-"want to keep the files on the server, use Contact Form 7 Database Addon – "
-"CFDB7 to access them."
-msgstr ""
-"Следует ли удалять временные файлы или сохранять их на сервере. Если вы "
-"хотите сохранить файлы на сервере, используйте Contact Form 7 Database Addon "
-"– CFDB7 для доступа к ним. "
-
 #: views/form.settings.optimizer.php:103
 msgid "Drag & Drop Area Template"
 msgstr "Шаблон поля drag & drop"
 
 #: views/form.settings.optimizer.php:103
-msgid ""
-"The template which is used to generate drag and drop area on the front end. "
-"Be careful when editing this field."
-msgstr ""
-"Шаблон, который используется для генерации поля drag & drop на фронт-енде. "
-"Редактируйте это поле с осторожностью."
+msgid "The template which is used to generate drag and drop area on the front end. Be careful when editing this field."
+msgstr "Шаблон, который используется для генерации поля drag & drop на фронт-енде. Редактируйте это поле с осторожностью."
 
 #: views/form.settings.optimizer.php:103
 msgid ""
@@ -309,11 +263,8 @@ msgstr "Этот плагин имеет несколько ограничени
 
 #: views/form.settings.optimizer.php:87
 msgid ""
-"* This plugin optimizes images of the following file formats: PNG, JPG, JPEG,"
-" GIF, BMP."
-msgstr ""
-"* Этот плагин оптимизирует изображения следующих форматов файлов: PNG, JPG, "
-"JPEG, GIF, BMP."
+"* This plugin supports the following file formats: PNG, JPG, JPEG, GIF, BMP."
+msgstr "* Плагин поддерживает файлы форматов PNG, JPG, JPEG, GIF, BMP."
 
 #: views/form.settings.optimizer.php:88
 msgid ""
@@ -331,11 +282,11 @@ msgstr ""
 "чёрный фон."
 
 #: frontend/index.php:42
-msgid "Maximum %d file is allowed."
-msgid_plural "Maximum %d files are allowed."
-msgstr[0] "Можно загрузить максимум %d файл."
-msgstr[1] "Можно загрузить максимум %d файла."
-msgstr[2] "Можно загрузить максимум %d файлов."
+msgid "Maximum %d image is allowed."
+msgid_plural "Maximum %d images are allowed."
+msgstr[0] "Можно загрузить максимум %d картинку."
+msgstr[1] "Можно загрузить максимум %d картинки."
+msgstr[2] "Можно загрузить максимум %d картинок."
 
 #: frontend/index.php:202
 msgid "Drag & Drop Images Here"
@@ -360,14 +311,6 @@ msgstr "Сжатый файл"
 #: frontend/index.php:208
 msgid "Delete"
 msgstr "Удалить"
-
-#: frontend/index.php:256
-msgid "The total files size should not exceed"
-msgstr "Общий размер файлов не должен превышать"
-
-#: frontend/index.php:257
-msgid "Uploading files..."
-msgstr "Загрузка файлов..."
 
 #: frontend/index.php:209
 msgid "Wrong file format"

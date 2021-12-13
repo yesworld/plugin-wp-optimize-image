@@ -44,6 +44,7 @@ Images Optimize and Upload CF7 is an extension plugin for [Contact Form 7](https
 = How can I send feedback or get help with a bug? =
 
 For any bug reports go to <a href="https://wordpress.org/support/plugin/images-optimize-and-upload-cf7/">Support</a> page.
+Or <a href="https://github.com/yesworld/plugin-wp-optimize-image/issues/">Github issue</a> page.
 
 == Installation ==
 

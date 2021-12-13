@@ -13,7 +13,7 @@ class Yr3kUploaderApi
      */
     public function __construct()
     {
-        $this->preg_pattern_img = '/\.'.YR3K_UPLOAD_TYPE_FILES.'$/i';
+        $this->preg_pattern_img = '/\.'.YR3K_UPLOAD_FILE_FORMATS.'$/i';
 
         // Ajax Upload Images
         add_action('wp_ajax_yr_api_uploader', [$this, 'upload']);
@@ -29,6 +29,10 @@ class Yr3kUploaderApi
     public function upload()
     {
         $files = $this->prepareFiles($_FILES[self::KEY_FILES]);
+        if ($files === null) {
+            return;
+        }
+
         $formId = $_POST['id'];
 
         $uploads_dir = wpcf7_maybe_add_random_dir(YR3K_UPLOAD_TEMP_DIR);
@@ -115,6 +119,10 @@ class Yr3kUploaderApi
      */
     public function prepareFiles($file_post)
     {
+        if ($file_post === null) {
+            return null;
+        }
+
         $new_array = [];
         $file_keys = array_keys($file_post);
 

@@ -190,8 +190,8 @@ class Yr3kUploaderFrontend
         return $this->template(
             sanitize_html_class($tag->name),
             wpcf7_format_atts($atts),
-            $validation_error, 
-			str_replace('|',',.','.'.YR3K_UPLOAD_TYPE_FILES)//кастомные типы файлов из файла настроек index.php
+            $validation_error,
+			str_replace('|',',.','.'.YR3K_UPLOAD_FILE_FORMATS)
         );
     }
 
@@ -224,40 +224,30 @@ class Yr3kUploaderFrontend
             true
         );
 
-        $targetSize = get_option('yr-images-optimize-upload-targetSize');
-        $quality = get_option('yr-images-optimize-upload-quality');
-        $minQuality = get_option('yr-images-optimize-upload-minQuality');
-        $qualityStepSize = get_option('yr-images-optimize-upload-qualityStepSize');
-        $maxWidth = get_option('yr-images-optimize-upload-maxWidth');
-        $maxHeight = get_option('yr-images-optimize-upload-maxHeight');
-        $resize = get_option('yr-images-optimize-upload-resize');
-        $throwIfSizeNotReached = get_option('yr-images-optimize-upload-throwIfSizeNotReached');
-		$sizefiles=get_option('yr-images-optimize-upload-sizefiles');
-
         wp_localize_script(
             self::NAME_HANDLE,
             'YR3K_UPLOADER_OPTIONS',
             [
                 'ajax_url' => admin_url('admin-ajax.php'),
-                'targetSize' => $targetSize ? $targetSize : 0.25,
-                'quality' => $quality ? $quality : 0.75,
-                'minQuality' => $minQuality ? $minQuality : 0.5,
-                'qualityStepSize' => $qualityStepSize ? $qualityStepSize : 0.1,
-                'maxWidth' => $maxWidth ? $maxWidth : 1920,
-                'maxHeight' => $maxHeight ? $maxHeight : 1920,
-                'resize' => $resize ? $resize : 1,
-                'throwIfSizeNotReached' => $throwIfSizeNotReached ? $throwIfSizeNotReached : 0,
-                'formatFile' => YR3K_UPLOAD_TYPE_FILES,
-				'sizefiles' => $sizefiles ? $sizefiles : 15,
+                'targetSize' => get_option('yr-images-optimize-upload-targetSize', 0.25),
+                'quality' => get_option('yr-images-optimize-upload-quality', 0.75),
+                'minQuality' => get_option('yr-images-optimize-upload-minQuality', 0.5),
+                'qualityStepSize' => get_option('yr-images-optimize-upload-qualityStepSize', 0.1),
+                'maxWidth' => get_option('yr-images-optimize-upload-maxWidth', 1920),
+                'maxHeight' => get_option('yr-images-optimize-upload-maxHeight', 1920),
+                'resize' => get_option('yr-images-optimize-upload-resize', 1),
+                'throwIfSizeNotReached' => get_option('yr-images-optimize-upload-throwIfSizeNotReached', 0),
+                'formatFile' => YR3K_UPLOAD_FILE_FORMATS,
+				'limitFilesSize' => get_option('yr-images-optimize-upload-file-size', 15),
                 'templatePreview' => get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()),
                 'templateDndArea' => get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()),
                 'language' => [
                     'info_file_origin' => __('Original size', YR3K_UPLOAD_REGISTRATION_NAME),
                     'info_file_compress' => __('Compressed', YR3K_UPLOAD_REGISTRATION_NAME),
                     'info_file_delete' => __('Delete', YR3K_UPLOAD_REGISTRATION_NAME),
-					'info_file_sizefiles' => __('The total files size should not exceed', YR3K_UPLOAD_REGISTRATION_NAME),
+					'info_file_limit_files_size' => __('The total files size should not exceed', YR3K_UPLOAD_REGISTRATION_NAME),
 					'info_file_uploading' => __('Uploading files...', YR3K_UPLOAD_REGISTRATION_NAME),
-                    'wrong_format' => __('Wrong file format', YR3K_UPLOAD_REGISTRATION_NAME),
+                    'info_file_wrong_format' => __('Wrong file format', YR3K_UPLOAD_REGISTRATION_NAME),
                 ],
             ]
         );
@@ -312,21 +302,20 @@ class Yr3kUploaderFrontend
      * @param $name
      * @param $attrs
      * @param $error
+     * @param $fileFormat
      *
      * @return string
      */
-    protected function template($name, $attrs, $error, $typefiles)
+    protected function template($name, $attrs, $error, $fileFormat)
     {
-        $template = '<span class="wpcf7-form-control-wrap %1$s wpcf7-images-optimize-upload-wrap">'
-            .'<input %2$s multiple="multiple" accept="'.$typefiles.'"/>'
-            .'%3$s'
-            .'</span>'
-        ;
-
         return sprintf(
-            $template,
+            '<span class="wpcf7-form-control-wrap %1$s wpcf7-images-optimize-upload-wrap">'
+            .'<input %2$s multiple="multiple" accept="%3$s"/>'
+            .'%4$s'
+            .'</span>',
             $name,
             $attrs,
+            $fileFormat,
             $error
         );
     }
