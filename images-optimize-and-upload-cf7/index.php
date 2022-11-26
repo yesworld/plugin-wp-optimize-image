@@ -14,7 +14,7 @@ define('YR3K_UPLOAD_BASENAME', plugin_basename(__FILE__));
 define('YR3K_UPLOAD_PATH', plugin_dir_path(__FILE__));
 define('YR3K_UPLOAD_REGISTRATION_NAME', dirname(YR3K_UPLOAD_BASENAME));
 define('YR3K_UPLOAD_SHORTCODE', 'upload_image');
-define('YR3K_UPLOAD_TYPE_FILES', 'png|jpg|jpeg|gif|bmp');
+define('YR3K_UPLOAD_FILE_FORMATS', get_option('yr-images-optimize-upload-file-formats', 'png|jpg|jpeg|gif|bmp'));
 
 $upload_dir = wp_upload_dir();
 define('YR3K_UPLOAD_TEMP_DIR', path_join($upload_dir['basedir'], 'wpcf7_upload_image'));

@@ -97,13 +97,13 @@ class Yr3kUploaderAdmin
      */
     public function rating_notice()
     {
-        $ratingOption = get_option('yr-images-optimize-upload-do-not-show-rating-tip', null);
+        $ratingOption = get_option(self::FIELD_NAME_SHOW_NOTICE, null);
 
         if ($ratingOption !== null && time() < $ratingOption) {
             return;
         }
 
-        $queryAdminUrl = get_admin_url();
+        $queryAdminUrl = admin_url(basename($_SERVER['REQUEST_URI']));
         $queryAdminUrl .= strpos($queryAdminUrl,'?') !== false ? '&' : '?';
         $queryAdminUrl .= 'yr_rating_notice=';
 
@@ -174,7 +174,7 @@ class Yr3kUploaderAdmin
     {
         $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
-            (is_dir("$dir/$file")) ? $this->delTree("$dir/$file") : unlink("$dir/$file");
+            is_dir("$dir/$file") ? $this->delTree("$dir/$file") : unlink("$dir/$file");
         }
 
         return rmdir($dir);

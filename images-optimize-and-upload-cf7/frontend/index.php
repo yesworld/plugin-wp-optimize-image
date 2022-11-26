@@ -111,7 +111,11 @@ class Yr3kUploaderFrontend
             }
 
             foreach ($posts[$tag->name] as $file) {
-                $shotPath = explode(self::UPLOAD_FOLDER . '/', $file)[1];
+                $shotPath = strpos($file, self::UPLOAD_FOLDER . '/') !== false
+                    ? explode(self::UPLOAD_FOLDER . '/', $file)[1]
+                    : $file
+                ;
+
                 $fullPath = path_join(YR3K_UPLOAD_TEMP_DIR, $shotPath);
                 $files[] = $fullPath;
             }
@@ -223,29 +227,20 @@ class Yr3kUploaderFrontend
             true
         );
 
-        $targetSize = get_option('yr-images-optimize-upload-targetSize');
-        $quality = get_option('yr-images-optimize-upload-quality');
-        $minQuality = get_option('yr-images-optimize-upload-minQuality');
-        $qualityStepSize = get_option('yr-images-optimize-upload-qualityStepSize');
-        $maxWidth = get_option('yr-images-optimize-upload-maxWidth');
-        $maxHeight = get_option('yr-images-optimize-upload-maxHeight');
-        $resize = get_option('yr-images-optimize-upload-resize');
-        $throwIfSizeNotReached = get_option('yr-images-optimize-upload-throwIfSizeNotReached');
-
         wp_localize_script(
             self::NAME_HANDLE,
             'YR3K_UPLOADER_OPTIONS',
             [
                 'ajax_url' => admin_url('admin-ajax.php'),
-                'targetSize' => $targetSize ? $targetSize : 0.25,
-                'quality' => $quality ? $quality : 0.75,
-                'minQuality' => $minQuality ? $minQuality : 0.5,
-                'qualityStepSize' => $qualityStepSize ? $qualityStepSize : 0.1,
-                'maxWidth' => $maxWidth ? $maxWidth : 1920,
-                'maxHeight' => $maxHeight ? $maxHeight : 1920,
-                'resize' => $resize ? $resize : 1,
-                'throwIfSizeNotReached' => $throwIfSizeNotReached ? $throwIfSizeNotReached : 0,
-                'formatFile' => YR3K_UPLOAD_TYPE_FILES,
+                'targetSize' => get_option('yr-images-optimize-upload-targetSize', 0.25),
+                'quality' => get_option('yr-images-optimize-upload-quality', 0.75),
+                'minQuality' => get_option('yr-images-optimize-upload-minQuality', 0.5),
+                'qualityStepSize' => get_option('yr-images-optimize-upload-qualityStepSize', 0.1),
+                'maxWidth' => get_option('yr-images-optimize-upload-maxWidth', 1920),
+                'maxHeight' => get_option('yr-images-optimize-upload-maxHeight', 1920),
+                'resize' => get_option('yr-images-optimize-upload-resize', 1),
+                'throwIfSizeNotReached' => get_option('yr-images-optimize-upload-throwIfSizeNotReached', 0),
+                'formatFile' => YR3K_UPLOAD_FILE_FORMATS,
                 'templatePreview' => get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()),
                 'templateDndArea' => get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()),
                 'language' => [

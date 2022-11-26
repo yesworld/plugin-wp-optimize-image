@@ -13,7 +13,7 @@ class Yr3kUploaderApi
      */
     public function __construct()
     {
-        $this->preg_pattern_img = '/\.'.YR3K_UPLOAD_TYPE_FILES.'$/i';
+        $this->preg_pattern_img = explode('|', YR3K_UPLOAD_FILE_FORMATS);
 
         // Ajax Upload Images
         add_action('wp_ajax_yr_api_uploader', [$this, 'upload']);
@@ -29,6 +29,10 @@ class Yr3kUploaderApi
     public function upload()
     {
         $files = $this->prepareFiles($_FILES[self::KEY_FILES]);
+        if ($files === null) {
+            return;
+        }
+
         $formId = $_POST['id'];
 
         $uploads_dir = wpcf7_maybe_add_random_dir(YR3K_UPLOAD_TEMP_DIR);
@@ -43,7 +47,8 @@ class Yr3kUploaderApi
                 return;
             }
 
-            if (1 != preg_match($this->preg_pattern_img, $file['name'])) {
+            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            if (!in_array($extension, $this->preg_pattern_img)) {
                 wp_send_json_error(YR3K_UPLOAD_ERRORS['incorrect_type']);
 
                 return;
@@ -86,7 +91,10 @@ class Yr3kUploaderApi
      */
     public function delete()
     {
-        if (!isset($_POST['file']) || empty($_POST['file'])) {
+        if (
+            (!isset($_POST['file']) || empty($_POST['file']))
+            || (count(explode('/', $_POST['file'])) !== 2)
+        ) {
             wp_send_json_error(wpcf7_get_message('invalid_required'));
 
             return;
@@ -115,6 +123,10 @@ class Yr3kUploaderApi
      */
     public function prepareFiles($file_post)
     {
+        if ($file_post === null) {
+            return null;
+        }
+
         $new_array = [];
         $file_keys = array_keys($file_post);
 
