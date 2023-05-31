@@ -26,6 +26,7 @@ jQuery(document).ready(function ($) {
       templateDndArea: '',
     }, options)
 
+
     let MAXFILE = +this.attr('max-file')
     let NAME_TAG = $(this).data('name')
     let txtErrorMaxFiles = this.attr('max-file-error')
@@ -72,7 +73,7 @@ jQuery(document).ready(function ($) {
         .on("drop", function (e) {
           upload(e.originalEvent.dataTransfer.files)
         })
-      ;
+        ;
 
       $dropZone.find('a.images-optimize-upload-button').on("click", function (e) {
         e.preventDefault();
@@ -100,6 +101,31 @@ jQuery(document).ready(function ($) {
         errorHandler() //hide error
         countImages = 0
       }, false);
+
+      // callback invalid input
+      document.addEventListener('wpcf7invalid', function (event) {
+        const uploadErr = arrayObjHasPropertyValue(event.detail.apiResponse.invalid_fields, 'field', NAME_TAG);
+
+        if (uploadErr) {
+          errorHandler(uploadErr);
+        }
+      }, false);
+    }
+
+    /**
+     * Check if object property in array has X value
+     * @param array
+     * @param property
+     * @param value
+     */
+    function arrayObjHasPropertyValue(array, property, value) {
+      for (let i = 0; i < array.length; i++) {
+        if (array[i][property] === value) {
+          return array[i]['message'];
+        }
+      }
+
+      return false;
     }
 
     /**
