@@ -1,5 +1,5 @@
 # Images Optimize and Upload CF7
-# ⚠️ The project is frozen!
+# ⚠️ The project is frozen! - You can create PR :)
 
 [Images Optimize and Upload CF7](https://wordpress.org/plugins/images-optimize-and-upload-cf7/#description) is an extension plugin for [Contact Form 7](https://wordpress.org/plugins/contact-form-7/) plugin, that allows you to upload multiple images using drag-n-drop or simple “Browse” button, and compress them on the client’s side before sending it. If you want to save a user’s time on uploading large images, this plugin is perfect solution.
 
