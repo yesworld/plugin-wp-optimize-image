@@ -87,8 +87,7 @@ jQuery(document).ready(function ($) {
       // click to remove image
       $list.on('click', 'li del', function () {
         let $li = $(this).parent();
-        deleteImage($li.find('input[type="hidden"]').val())
-
+        $li.find('input[type="hidden"]').val('')
         $li.remove();
         countImages--
         errorHandler() //hide error
@@ -229,35 +228,6 @@ jQuery(document).ready(function ($) {
         },
         error: function () {
           disableForm(false);
-          console.log('error: ', arguments)
-        }
-      })
-    }
-
-    /**
-     * Delete an image
-     * @param file
-     */
-    function deleteImage(file) {
-      let data = {
-        action: 'yr_api_delete',
-        file: file
-      }
-
-      $.ajax({
-        url: setting.ajax_url,
-        type: 'post',
-        data: data,
-        dataType: 'json',
-        cache: false,
-        success: function (res) {
-          console.log('success: ', res)
-
-          if (!res.success) {
-            return;
-          }
-        },
-        error: function () {
           console.log('error: ', arguments)
         }
       })

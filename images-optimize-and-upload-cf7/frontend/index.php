@@ -11,7 +11,7 @@ class Yr3kUploaderFrontend
 
         // Hook before/after for mail cf7
         add_filter('wpcf7_posted_data_'.YR3K_UPLOAD_SHORTCODE, [$this, 'change_post_data'], 8, 1);
-        add_action('wpcf7_before_send_mail', [$this, 'before_send_mail'], 9, 1);
+        add_action('wpcf7_before_send_mail', [$this, 'before_send_mail'], 999, 3);
         add_action('wpcf7_mail_sent', [$this, 'after_mail_sent'], 100);
 
         // Validation
@@ -63,6 +63,20 @@ class Yr3kUploaderFrontend
             }
 
             unlink($file);
+
+            $tempDir = dirname($file);
+            $uploadBase = realpath(YR3K_UPLOAD_TEMP_DIR);
+            $tempDirReal = realpath($tempDir);
+
+            // remove empty folder
+            if (
+                $tempDirReal &&
+                strpos($tempDirReal, $uploadBase) === 0 &&
+                is_dir($tempDirReal) &&
+                count(glob($tempDirReal . '/*')) === 0
+            ) {
+                rmdir($tempDirReal);
+            }
         }
 
         return $wpcf7;
@@ -132,7 +146,10 @@ class Yr3kUploaderFrontend
 
         // Prop email
         $mail = $wpcf7->prop('mail');
-        $mail['attachments'] = implode("\n", $files);
+        $existing = isset($mail['attachments']) ? (array) $mail['attachments'] : [];
+        $all = array_merge($existing, $files);
+        $mail['attachments'] = implode("\n", array_unique(array_filter($all)));
+
         $wpcf7->set_properties(['mail' => $mail]);
 
         return $wpcf7;

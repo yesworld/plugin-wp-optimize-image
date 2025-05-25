@@ -18,9 +18,6 @@ class Yr3kUploaderApi
         // Ajax Upload Images
         add_action('wp_ajax_yr_api_uploader', [$this, 'upload']);
         add_action('wp_ajax_nopriv_yr_api_uploader', [$this, 'upload']);
-
-        add_action('wp_ajax_yr_api_delete', [$this, 'delete']);
-        add_action('wp_ajax_nopriv_yr_api_delete', [$this, 'delete']);
     }
 
     /**
@@ -83,34 +80,6 @@ class Yr3kUploaderApi
         }
 
         wp_send_json_success($json);
-        die();
-    }
-
-    /**
-     * Delete uploaded files on frontend with ajax.
-     */
-    public function delete()
-    {
-        if (
-            (!isset($_POST['file']) || empty($_POST['file']))
-            || (count(explode('/', $_POST['file'])) !== 2)
-        ) {
-            wp_send_json_error(wpcf7_get_message('invalid_required'));
-
-            return;
-        }
-
-        $pathFile = sanitize_text_field($_POST['file']);
-        $file_path = path_join(YR3K_UPLOAD_TEMP_DIR, $pathFile);
-
-        if (!file_exists($file_path)) {
-            wp_send_json_error(wpcf7_get_message('invalid_required'));
-
-            return;
-        }
-
-        wp_delete_file($file_path);
-        wp_send_json_success();
         die();
     }
 
