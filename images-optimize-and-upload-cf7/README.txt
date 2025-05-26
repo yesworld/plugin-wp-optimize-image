@@ -7,7 +7,8 @@ Stable tag: 2.2.1
 Requires PHP: 5.2
 License: GNU GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Short Description: Allows uploading and client-side compression of multiple images in Contact Form 7.
+
+Allows uploading and client-side compression of multiple images in Contact Form 7.
 
 == Description ==
 
