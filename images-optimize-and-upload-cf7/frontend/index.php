@@ -125,13 +125,11 @@ class Yr3kUploaderFrontend
             }
 
             foreach ($posts[$tag->name] as $file) {
-                $shotPath = strpos($file, self::UPLOAD_FOLDER . '/') !== false
-                    ? explode(self::UPLOAD_FOLDER . '/', $file)[1]
-                    : $file
-                ;
+                $fullPath = $this->getUploadedTempFilePath($file);
 
-                $fullPath = path_join(YR3K_UPLOAD_TEMP_DIR, $shotPath);
-                $files[] = $fullPath;
+                if ($fullPath) {
+                    $files[] = $fullPath;
+                }
             }
         }
 
@@ -202,9 +200,21 @@ class Yr3kUploaderFrontend
         $atts['data-name'] = $tag->name;
 
         $dataTag = $this->parseTagMaxFile($tag);
+        $uploadToken = wp_generate_password(32, false);
+
+        // Store a short-lived token for this rendered CF7 upload field.
+        set_transient(
+            YR3K_UPLOAD_TOKEN_PREFIX . md5($uploadToken),
+            [
+                'field_name' => $tag->name,
+                'max_files' => $dataTag['max-file'],
+            ],
+            YR3K_UPLOAD_TOKEN_TTL
+        );
 
         $atts['max-file-error'] = $dataTag['max-file-error'];
         $atts['max-file'] = $dataTag['max-file'];
+        $atts['data-upload-token'] = $uploadToken;
 
         $this->load_enqueue_script();
 
@@ -249,6 +259,7 @@ class Yr3kUploaderFrontend
             'YR3K_UPLOADER_OPTIONS',
             [
                 'ajax_url' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce(YR3K_UPLOAD_AJAX_NONCE),
                 'targetSize' => get_option('yr-images-optimize-upload-targetSize', 0.25),
                 'quality' => get_option('yr-images-optimize-upload-quality', 0.75),
                 'minQuality' => get_option('yr-images-optimize-upload-minQuality', 0.5),
@@ -265,6 +276,7 @@ class Yr3kUploaderFrontend
                     'info_file_compress' => __('Compressed', YR3K_UPLOAD_REGISTRATION_NAME),
                     'info_file_delete' => __('Delete', YR3K_UPLOAD_REGISTRATION_NAME),
                     'wrong_format' => __('Wrong file format', YR3K_UPLOAD_REGISTRATION_NAME),
+                    'upload_error' => YR3K_UPLOAD_ERRORS['forbidden'],
                 ],
             ]
         );
@@ -311,6 +323,48 @@ class Yr3kUploaderFrontend
         }
 
         return false;
+    }
+
+    /**
+     * Resolve a posted upload value to a file inside the plugin temp folder.
+     * This prevents hidden form values from attaching files outside uploads.
+     *
+     * @param string $file
+     *
+     * @return string|false
+     */
+    protected function getUploadedTempFilePath($file)
+    {
+        if (!is_string($file) || '' === $file) {
+            return false;
+        }
+
+        $file = str_replace('\\', '/', sanitize_text_field(wp_unslash($file)));
+        if (false !== strpos($file, self::UPLOAD_FOLDER . '/')) {
+            $parts = explode(self::UPLOAD_FOLDER . '/', $file, 2);
+            $file = isset($parts[1]) ? $parts[1] : '';
+        }
+
+        $file = ltrim($file, '/');
+        if ('' === $file) {
+            return false;
+        }
+
+        $uploadBase = realpath(YR3K_UPLOAD_TEMP_DIR);
+        $fullPath = realpath(path_join(YR3K_UPLOAD_TEMP_DIR, $file));
+
+        if (!$uploadBase || !$fullPath || !is_file($fullPath)) {
+            return false;
+        }
+
+        $uploadBase = rtrim(wp_normalize_path($uploadBase), '/') . '/';
+        $fullPathNormalized = wp_normalize_path($fullPath);
+
+        if (0 !== strpos($fullPathNormalized, $uploadBase)) {
+            return false;
+        }
+
+        return $fullPath;
     }
 
     /**

@@ -32,7 +32,7 @@ msgstr ""
 "стороне клиента и загружает картинки в плагине Contact Form 7. Вы получаете "
 "лёгкие и оптимизированные картинки."
 
-#: index.php:22
+#: index.php:28
 msgid ""
 "There was an error uploading the file. Please contact the website "
 "administrator."
@@ -40,11 +40,15 @@ msgstr ""
 "При загрузке файла возникла ошибка. Пожалуйста, обратитесь к администратору "
 "сайта."
 
-#: index.php:23
+#: index.php:29
 msgid "You are not allowed to upload files of this type."
 msgstr "Вы не можете загрузить файлы данного формата."
 
-#: admin/index.php:30
+#: index.php:30
+msgid "The upload session has expired. Please refresh the page and try again."
+msgstr "Срок действия сессии истек. Пожалуйста, обновите страницу и попробуйте снова."
+
+#: admin/index.php:36
 msgid ""
 "Generate a form-tag for an Image Optimize & Upload field. For more details, "
 "see %s."
@@ -52,7 +56,7 @@ msgstr ""
 "Генерируйте тег формы для поля загрузки оптимизированных изображений. Для "
 "более подробной информации см. %s."
 
-#: admin/index.php:33
+#: admin/index.php:39
 msgid "Images Optimize & Upload on GitHub"
 msgstr "Images Optimize & Upload на GitHub"
 
@@ -60,35 +64,35 @@ msgstr "Images Optimize & Upload на GitHub"
 msgid "Images Optimize & Upload - Settings"
 msgstr "Images Optimize & Upload - Настройки"
 
-#: views/form.settings.optimizer.php:14
+#: views/form.settings.optimizer.php:20
 msgid "Maximum Files"
 msgstr "Максимум файлов"
 
-#: views/form.settings.optimizer.php:88 views/form.settings.optimizer.php:90
+#: views/form.settings.optimizer.php:113
 msgid "Images Preview Template"
 msgstr "Шаблон превьюшек"
 
-#: views/form.settings.optimizer.php:88
+#: views/form.settings.optimizer.php:123
 msgid ""
-"The template, which is used to generate images previews on the front end."
+"The template which is used to generate images previews on the front end. This field can not be empty."
 msgstr ""
-"Шаблон, который используется для генерирования превьюшек на фронт-енде."
+"Шаблон, который используется для генерирования превьюшек на фронт-енде. Это поле не может быть пустым."
 
-#: views/form.settings.optimizer.php:16
+#: views/form.settings.optimizer.php:22
 msgid "Default:"
 msgstr "По умолчанию:"
 
-#: views/form.settings.optimizer.php:17
+#: views/form.settings.optimizer.php:23
 msgid "The maximum number of images that users can upload in one form."
 msgstr ""
 "Максимальное количество файлов, который пользователи могут загрузить в одной "
 "форме."
 
-#: views/form.settings.optimizer.php:21
+#: views/form.settings.optimizer.php:27
 msgid "Output Target File Size"
 msgstr "Размер итогового файла"
 
-#: views/form.settings.optimizer.php:24
+#: views/form.settings.optimizer.php:30
 msgid ""
 "The output file size of the image in MB. If the image size is greater than "
 "the output target file size after a compression, the image is compressed "
@@ -102,11 +106,11 @@ msgstr ""
 "значения &lt;= размера итогового файла, либо не достигнет минимального "
 "качества. Значение по умолчанию: 0.2 (200 КБ)."
 
-#: views/form.settings.optimizer.php:28
+#: views/form.settings.optimizer.php:34
 msgid "Quality"
 msgstr "Качество"
 
-#: views/form.settings.optimizer.php:31
+#: views/form.settings.optimizer.php:37
 msgid ""
 "The initial quality to compress the image at. Default value: 0.75 (75% "
 "compression)."
@@ -114,11 +118,11 @@ msgstr ""
 "Качество, в которое будет сжиматься картинки. Значение по умолчанию: 0.75 "
 "(75% сжатия)."
 
-#: views/form.settings.optimizer.php:35
+#: views/form.settings.optimizer.php:41
 msgid "Minimum Quality"
 msgstr "Минимальной качество"
 
-#: views/form.settings.optimizer.php:38
+#: views/form.settings.optimizer.php:44
 msgid ""
 "The minimum quality allowed for an image compression. This is only relevant "
 "if the initial compression does not make the image size &lt;= the Desired "
@@ -128,11 +132,11 @@ msgstr ""
 "случае, если качество картинки при сжатии не позволяет достигнуть значения "
 "&lt;= размера итогового файла."
 
-#: views/form.settings.optimizer.php:42
+#: views/form.settings.optimizer.php:48
 msgid "Quality Step Size"
 msgstr "Размер шага качества"
 
-#: views/form.settings.optimizer.php:45
+#: views/form.settings.optimizer.php:51
 msgid ""
 "The amount to try reducing the quality by in each iteration, if the image "
 "size is still &gt; the Desired Output File Size."
@@ -140,11 +144,11 @@ msgstr ""
 "Размер шага качества картинки при сжатии, в случае если размер картинки всё "
 "ещё &gt; размер итогового файла."
 
-#: views/form.settings.optimizer.php:49
+#: views/form.settings.optimizer.php:55
 msgid "Maximum Width"
 msgstr "Максимальная ширина"
 
-#: views/form.settings.optimizer.php:52
+#: views/form.settings.optimizer.php:58
 msgid ""
 "The maximum width of the output image. The value is in pixels. Please, use "
 "only numbers."
@@ -152,11 +156,11 @@ msgstr ""
 "Максимальная ширина итоговой картинки. Значение в пикселях. Пожалуйста, "
 "используйте только цифры."
 
-#: views/form.settings.optimizer.php:56
+#: views/form.settings.optimizer.php:62
 msgid "Maximum Height"
 msgstr "Максимальная высота"
 
-#: views/form.settings.optimizer.php:59
+#: views/form.settings.optimizer.php:65
 msgid ""
 "The maximum height of the output image. The value is in pixels. Please, use "
 "only numbers."
@@ -164,19 +168,19 @@ msgstr ""
 "Максимальная высота итоговой картинки. Значение в пикселях. Пожалуйста, "
 "используйте только цифры."
 
-#: views/form.settings.optimizer.php:63
+#: views/form.settings.optimizer.php:69
 msgid "Resize"
 msgstr "Изменять размер"
 
-#: views/form.settings.optimizer.php:66
+#: views/form.settings.optimizer.php:72
 msgid "Yes"
 msgstr "Да"
 
-#: views/form.settings.optimizer.php:67
+#: views/form.settings.optimizer.php:73
 msgid "No"
 msgstr "Нет"
 
-#: views/form.settings.optimizer.php:69
+#: views/form.settings.optimizer.php:75
 msgid ""
 "Whether the image should be resized to within the bounds set by Maximum "
 "Width and Maximum Height (maintains the aspect ratio)."
@@ -184,94 +188,86 @@ msgstr ""
 "Нужно ли изменять размер картинки в соответствии с размерами, указанными в "
 "максимальной ширине и высоте (соотношение сторон сохраняется)."
 
-#: views/form.settings.optimizer.php:73
+#: views/form.settings.optimizer.php:79
 msgid "Show Errors in Browser Console"
 msgstr "Показывать ошибки в консоли браузера"
 
-#: views/form.settings.optimizer.php:79
+#: views/form.settings.optimizer.php:85
 msgid ""
 "Whether to throw an Error if the Desired Output File Size is not reached."
 msgstr ""
 "Показывать ли ошибки в консоли браузера, если размер итогового файла не был "
 "достигнут."
 
-#: views/form.settings.optimizer.php:103
+#: views/form.settings.optimizer.php:99
 msgid "Drag & Drop Area Template"
 msgstr "Шаблон поля drag & drop"
 
-#: views/form.settings.optimizer.php:103
+#: views/form.settings.optimizer.php:109
 msgid "The template which is used to generate drag and drop area on the front end. Be careful when editing this field."
 msgstr "Шаблон, который используется для генерации поля drag & drop на фронт-енде. Редактируйте это поле с осторожностью."
 
-#: views/form.settings.optimizer.php:103
-msgid ""
-"The template which is used to generate images previews on the front end. "
-"This field can not be empty."
-msgstr ""
-"Шаблон, который используется на генерации превьюшек загруженных картинок на "
-"фронт-енде. Это поле не может быть пустым."
-
-#: views/form.settings.optimizer.php:104
+#: views/form.settings.optimizer.php:124
 msgid "Uploaded image file name."
 msgstr "Имя загруженного файла."
 
-#: views/form.settings.optimizer.php:105
+#: views/form.settings.optimizer.php:125
 msgid "Original image size. In MB."
 msgstr "Размер оригинального файла. В МБ."
 
-#: views/form.settings.optimizer.php:106
+#: views/form.settings.optimizer.php:126
 msgid "Optimized image size. In MB."
 msgstr "Размер оптимизированного файла. В МБ."
 
-#: views/form.settings.optimizer.php:107
+#: views/form.settings.optimizer.php:127
 msgid "Original image width."
 msgstr "Ширина оригинального файла."
 
-#: views/form.settings.optimizer.php:108
+#: views/form.settings.optimizer.php:128
 msgid "Original image height."
 msgstr "Высота оригинального файла."
 
-#: views/form.settings.optimizer.php:109
+#: views/form.settings.optimizer.php:129
 msgid "Optimized image width."
 msgstr "Ширина оптимизированного файла."
 
-#: views/form.settings.optimizer.php:110
+#: views/form.settings.optimizer.php:130
 msgid "Optimized image height."
 msgstr "Высота оптимизированного файла."
 
-#: views/form.settings.optimizer.php:111
+#: views/form.settings.optimizer.php:131
 msgid "Delete tooltip text."
 msgstr "Текст подсказки Удалить."
 
-#: views/form.settings.optimizer.php:112
+#: views/form.settings.optimizer.php:132
 msgid "Original Size text."
 msgstr "Текст Оригинал."
 
-#: views/form.settings.optimizer.php:113
+#: views/form.settings.optimizer.php:133
 msgid "Compressed text."
 msgstr "Текст Сжатый файл."
 
-#: views/form.settings.optimizer.php:84
+#: views/form.settings.optimizer.php:138
 msgid "Limitations"
 msgstr "Ограничения"
 
-#: views/form.settings.optimizer.php:85
+#: views/form.settings.optimizer.php:139
 msgid "There are several limitations for this plugin:"
 msgstr "Этот плагин имеет несколько ограничений:"
 
-#: views/form.settings.optimizer.php:87
+#: views/form.settings.optimizer.php:141
 msgid ""
 "* This plugin supports the following file formats: PNG, JPG, JPEG, GIF, BMP."
 msgstr "* Плагин поддерживает файлы форматов PNG, JPG, JPEG, GIF, BMP."
 
-#: views/form.settings.optimizer.php:88
+#: views/form.settings.optimizer.php:142
 msgid ""
 "* When working with animated GIF, the compressed image will no longer "
 "animate."
 msgstr ""
 "* При загрузке анимированных картинок GIF, анимация перестанет работать."
 
-#: views/form.settings.optimizer.php:89
+#: views/form.settings.optimizer.php:143
 msgid ""
 "* When working with PNG with transparent background, the compressed image "
 "will lose transparency and result in black background."
@@ -279,7 +275,7 @@ msgstr ""
 "* При загрузке картинок PNG с прозрачным фоном, сжатый файл будет иметь "
 "чёрный фон."
 
-#: frontend/index.php:42
+#: frontend/index.php:302
 msgid "Maximum %d image is allowed."
 msgid_plural "Maximum %d images are allowed."
 msgstr[0] "Можно загрузить максимум %d картинку."
@@ -298,18 +294,18 @@ msgstr "или"
 msgid "Browse Files"
 msgstr "Выбрать файл"
 
-#: frontend/index.php:206
+#: frontend/index.php:275
 msgid "Original size"
 msgstr "Оригинал"
 
-#: frontend/index.php:207
+#: frontend/index.php:276
 msgid "Compressed"
 msgstr "Сжатый файл"
 
-#: frontend/index.php:208
+#: frontend/index.php:277
 msgid "Delete"
 msgstr "Удалить"
 
-#: frontend/index.php:209
+#: frontend/index.php:278
 msgid "Wrong file format"
 msgstr "Недопустимый формат файла"

@@ -2,8 +2,8 @@
 Contributors: yesworld, bruklig
 Tags: images, compression, contact form 7, drag and drop, multiple file
 Requires at least: 5.2.2
-Tested up to: 6.8.1
-Stable tag: 2.2.1
+Tested up to: 6.9.4
+Stable tag: 2.2.2
 Requires PHP: 5.2
 License: GNU GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -62,6 +62,11 @@ To install this plugin see below:
 3. Drag-n-Drop Field and File Attachment - Front End
 
 == Changelog ==
+
+= 2.2.2 =
+Fixed unauthenticated arbitrary file upload vulnerability.
+Added nonce and upload session token validation for AJAX uploads.
+Added server-side image file validation and improved upload error handling.
 
 = 2.2.1 =
 Fixed file deletion vulnerability

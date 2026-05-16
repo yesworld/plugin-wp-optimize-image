@@ -8,6 +8,7 @@ jQuery(document).ready(function ($) {
       info_file_compress: language.info_file_compress,
       wrong_format: language.wrong_format,
       info_file_delete: language.info_file_delete,
+      upload_error: language.upload_error || 'There was an error uploading the file. Please refresh the page and try again.',
 
       ajax_url: YR3K_UPLOADER_OPTIONS.ajax_url,
       formatFile: new RegExp('\(' + YR3K_UPLOADER_OPTIONS.formatFile + ')$', 'i'),
@@ -132,6 +133,7 @@ jQuery(document).ready(function ($) {
       compress
         .compress(images)
         .then((conversions) => {
+          let uploadKeys = [];
 
           for (let i = 0; conversions.length > i; i++) {
 
@@ -142,6 +144,7 @@ jQuery(document).ready(function ($) {
             const objectUrl = URL.createObjectURL(photo.data)
 
             let randomString = getRandomString();
+            uploadKeys.push(randomString);
 
             // create Li and append to list UL
             createLiHtml(objectUrl, photo, info, randomString);
@@ -151,7 +154,9 @@ jQuery(document).ready(function ($) {
 
           formData.append("action", "yr_api_uploader");
           formData.append("id", ID);
-          send(formData)
+          formData.append("nonce", YR3K_UPLOADER_OPTIONS.nonce);
+          formData.append("upload_token", th.data('upload-token'));
+          send(formData, uploadKeys)
         })
 
       emptyUpload()
@@ -201,8 +206,9 @@ jQuery(document).ready(function ($) {
     /**
      * Send images into the Server
      * @param data
+     * @param uploadKeys
      */
-    function send(data) {
+    function send(data, uploadKeys) {
       $.ajax({
         url: setting.ajax_url,
         type: 'post',
@@ -215,6 +221,7 @@ jQuery(document).ready(function ($) {
           disableForm(false);
 
           if (!res.success) {
+            handleUploadError(getUploadErrorMessage(res), uploadKeys);
             return;
           }
 
@@ -226,11 +233,49 @@ jQuery(document).ready(function ($) {
               .show();
           }
         },
-        error: function () {
+        error: function (xhr) {
           disableForm(false);
-          console.log('error: ', arguments)
+          handleUploadError(getUploadErrorMessage(xhr.responseJSON), uploadKeys);
         }
       })
+    }
+
+    /**
+     * Roll back failed upload previews and show a useful error.
+     * @param message
+     * @param uploadKeys
+     */
+    function handleUploadError(message, uploadKeys) {
+      if (Array.isArray(uploadKeys)) {
+        for (let i = 0; i < uploadKeys.length; i++) {
+          $list.find('li.yr3k-' + uploadKeys[i]).remove();
+        }
+
+        countImages = Math.max(0, countImages - uploadKeys.length);
+      }
+
+      errorHandler(message || setting.upload_error);
+    }
+
+    /**
+     * Extract a readable upload error from a WordPress JSON response.
+     * @param response
+     * @return {string}
+     */
+    function getUploadErrorMessage(response) {
+      if (!response || !response.data) {
+        return setting.upload_error;
+      }
+
+      if (typeof response.data === 'string') {
+        return response.data;
+      }
+
+      if (response.data.message) {
+        return response.data.message;
+      }
+
+      return setting.upload_error;
     }
 
     /**
