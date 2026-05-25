@@ -2,7 +2,7 @@
 Contributors: yesworld, bruklig
 Tags: images, compression, contact form 7, drag and drop, multiple file
 Requires at least: 5.2.2
-Tested up to: 6.9.4
+Tested up to: 7.0
 Stable tag: 2.2.2
 Requires PHP: 5.2
 License: GNU GPL v2 or later
@@ -13,6 +13,7 @@ Allows uploading and client-side compression of multiple images in Contact Form 
 == Description ==
 
 Images Optimize and Upload CF7 is an extension plugin for [Contact Form 7](https://wordpress.org/plugins/contact-form-7/) plugin, that allows you to upload multiple images using drag-n-drop or simple "Browse" button, and compress them on the client's side before sending it. If you want to save a user's time and bandwidth on uploading large images, this plugin is perfect solution.
+Tested with Contact Form 7 version 6.1.6
 
 = Features =
 
@@ -62,6 +63,9 @@ To install this plugin see below:
 3. Drag-n-Drop Field and File Attachment - Front End
 
 == Changelog ==
+
+= 2.2.3 =
+Fixed default value
 
 = 2.2.2 =
 Fixed unauthenticated arbitrary file upload vulnerability.
