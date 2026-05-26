@@ -398,7 +398,7 @@ class Yr3kUploaderFrontend
     protected function template($name, $attrs, $error)
     {
         $template = '<span class="wpcf7-form-control-wrap %1$s wpcf7-images-optimize-upload-wrap">'
-            .'<input %2$s multiple="multiple" accept="image/png,image/jpeg"/>'
+            .'<input %2$s multiple="multiple" accept="%4$s"/>'
             .'%3$s'
             .'</span>'
         ;
@@ -407,7 +407,24 @@ class Yr3kUploaderFrontend
             $template,
             $name,
             $attrs,
-            $error
+            $error,
+            esc_attr($this->getAcceptFormats())
         );
+    }
+
+    /**
+     * Build file input accept value from the configured extension allowlist.
+     *
+     * @return string
+     */
+    private function getAcceptFormats()
+    {
+        $extensions = array_unique(array_filter(array_map(function ($extension) {
+            return strtolower(ltrim(trim($extension), '.'));
+        }, explode('|', YR3K_UPLOAD_FILE_FORMATS))));
+
+        return implode(',', array_map(function ($extension) {
+            return '.' . $extension;
+        }, $extensions));
     }
 }

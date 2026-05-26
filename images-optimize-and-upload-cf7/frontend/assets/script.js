@@ -11,7 +11,7 @@ jQuery(document).ready(function ($) {
       upload_error: language.upload_error || 'There was an error uploading the file. Please refresh the page and try again.',
 
       ajax_url: YR3K_UPLOADER_OPTIONS.ajax_url,
-      formatFile: new RegExp('\(' + YR3K_UPLOADER_OPTIONS.formatFile + ')$', 'i'),
+      formatFile: new RegExp('\\.(' + YR3K_UPLOADER_OPTIONS.formatFile + ')$', 'i'),
 
       targetSize: 0.25,
       quality: 0.75,

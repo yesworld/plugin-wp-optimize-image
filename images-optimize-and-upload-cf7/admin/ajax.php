@@ -59,6 +59,10 @@ class Yr3kUploaderApi
             // Add filter on upload file name
             $filename = apply_filters('wpcf7_upload_file_name', $filename, $originalName);
 
+            if (1 === (int) get_option('yr-images-optimize-upload-lowercase-filenames', 0)) {
+                $filename = strtolower($filename);
+            }
+
             // Generate new unique filename
             $filename = wp_unique_filename($uploads_dir, $filename);
             $filename = $formId == '0' ? $filename : 'ID_' . $formId . '_' . $filename;

@@ -6,15 +6,15 @@
  * Author URI: https://github.com/yesworld
  * Domain Path: /languages
  * License: GPL2
- * Version: 2.2.2
+ * Version: 2.3.0
  */
-define('YR3K_UPLOAD_VERSION', '2.2.2');
-define('YR3K_UPLOAD_REQUIRED_WP_VERSION', '4.9');
+define('YR3K_UPLOAD_VERSION', '2.3.0');
 define('YR3K_UPLOAD_BASENAME', plugin_basename(__FILE__));
 define('YR3K_UPLOAD_PATH', plugin_dir_path(__FILE__));
 define('YR3K_UPLOAD_REGISTRATION_NAME', dirname(YR3K_UPLOAD_BASENAME));
 define('YR3K_UPLOAD_SHORTCODE', 'upload_image');
-define('YR3K_UPLOAD_FILE_FORMATS', get_option('yr-images-optimize-upload-file-formats', 'png|jpg|jpeg|gif|bmp'));
+define('YR3K_UPLOAD_DEFAULT_FILE_FORMATS', 'png|jpg|jpeg|gif|bmp');
+define('YR3K_UPLOAD_FILE_FORMATS', get_option('yr-images-optimize-upload-file-formats', YR3K_UPLOAD_DEFAULT_FILE_FORMATS));
 define('YR3K_UPLOAD_AJAX_NONCE', 'yr3k_upload_images');
 define('YR3K_UPLOAD_TOKEN_PREFIX', 'yr3k_upload_');
 define('YR3K_UPLOAD_TOKEN_TTL', 30 * MINUTE_IN_SECONDS);

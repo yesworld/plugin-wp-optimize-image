@@ -1,6 +1,7 @@
 <?php
 echo '<div class="wrap">';
 echo '<h1>'; ?><?php echo esc_html(__('Images Optimize & Upload - Settings', YR3K_UPLOAD_REGISTRATION_NAME)); ?><?php echo '</h1>';
+settings_errors($fileFormatsOption);
 echo '<form method="post" action="options.php">';
 
 $htmlAttrSelected = 'selected="selected"';
@@ -8,6 +9,7 @@ $htmlAttrSelected = 'selected="selected"';
 $selectedResize = get_option('yr-images-optimize-upload-resize', true);
 $throwIfSizeNotReached = get_option('yr-images-optimize-upload-throwIfSizeNotReached');
 $removeFileAfterSend = get_option('yr-images-optimize-upload-removeFileAfterSend', 1);
+$lowercaseFilenames = get_option($lowercaseFilenamesOption, 0);
 
 $templatePreview = esc_html(get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()));
 $templateDndArea = esc_html(get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()));
@@ -16,6 +18,24 @@ settings_fields(YR3K_UPLOAD_REGISTRATION_NAME);
 do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
 ?>
 <table class="form-table">
+  <tr>
+    <th scope="row"><label for="<?php echo esc_attr($fileFormatsOption); ?>"><?php echo esc_html(__('File Formats', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
+      <td>
+        <input name="<?php echo esc_attr($fileFormatsOption); ?>" id="<?php echo esc_attr($fileFormatsOption); ?>" type="text" placeholder="<?php echo esc_attr(YR3K_UPLOAD_DEFAULT_FILE_FORMATS); ?>" value="<?php echo esc_attr(get_option($fileFormatsOption, YR3K_UPLOAD_DEFAULT_FILE_FORMATS)); ?>" class="regular-text">
+        <p class="description"><?php echo esc_html(__('Enter lowercase file extensions separated by a vertical bar. File extension checks are case-insensitive.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
+      </td>
+  </tr>
+  <tr>
+    <th scope="row"><label for="<?php echo esc_attr($lowercaseFilenamesOption); ?>"><?php echo esc_html(__('Lowercase File Names', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
+      <td>
+        <input type="hidden" name="<?php echo esc_attr($lowercaseFilenamesOption); ?>" value="0">
+        <label for="<?php echo esc_attr($lowercaseFilenamesOption); ?>">
+          <input name="<?php echo esc_attr($lowercaseFilenamesOption); ?>" id="<?php echo esc_attr($lowercaseFilenamesOption); ?>" type="checkbox" value="1" <?php checked(1, $lowercaseFilenames); ?>>
+          <?php echo esc_html(__('Convert uploaded file names to lowercase before saving.', YR3K_UPLOAD_REGISTRATION_NAME)); ?>
+        </label>
+        <p class="description"><?php echo esc_html(__('Enable this if your WordPress, server, or security settings reject files with uppercase extensions.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
+      </td>
+  </tr>
   <tr>
     <th scope="row"><label for="yr-images-optimize-upload-maxFiles"><?php echo esc_html(__('Maximum Files', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
       <td>
@@ -93,6 +113,7 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
           <option value="1" <?php echo (1 == $removeFileAfterSend) ? $htmlAttrSelected : ''; ?>><?php echo esc_html(__('Yes', YR3K_UPLOAD_REGISTRATION_NAME)); ?></option>
         </select>
         <p class="description"><?php echo esc_html(__('Whether the temporary files should be removed or saved on the server. If you want to keep the files on the server, use Contact Form 7 Database Addon – CFDB7 to access them.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
+        <p class="description"><?php echo esc_html(__('Temporary files location: /wp-content/uploads/wpcf7_upload_image', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
       </td>
   </tr>
   <tr>

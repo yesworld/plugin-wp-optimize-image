@@ -49,7 +49,11 @@ class Yr3kUploaderButtonTagCF7
 class Yr3kUploaderAdmin
 {
     private const FIELD_NAME_SHOW_NOTICE = 'yr-images-optimize-upload-do-not-show-rating-tip';
+    private const FIELD_NAME_FILE_FORMATS = 'yr-images-optimize-upload-file-formats';
+    private const FIELD_NAME_LOWERCASE_FILENAMES = 'yr-images-optimize-upload-lowercase-filenames';
     private $register = [
+        self::FIELD_NAME_FILE_FORMATS,
+        self::FIELD_NAME_LOWERCASE_FILENAMES,
         'yr-images-optimize-upload-targetSize',
         'yr-images-optimize-upload-quality',
         'yr-images-optimize-upload-minQuality',
@@ -88,6 +92,14 @@ class Yr3kUploaderAdmin
     public function general_admin_notice()
     {
         if (isset($_GET['page']) && 'optimizer-3000' == $_GET['page'] && isset($_REQUEST['settings-updated'])) {
+            $errors = get_settings_errors(self::FIELD_NAME_FILE_FORMATS);
+
+            foreach ($errors as $error) {
+                if (isset($error['type']) && 'error' === $error['type']) {
+                    return;
+                }
+            }
+
             echo '<div class="notice notice-success is-dismissible"><p>'.__('Settings saved.').'</p></div>';
         }
     }
@@ -144,6 +156,8 @@ class Yr3kUploaderAdmin
      */
     public function template()
     {
+        $fileFormatsOption = self::FIELD_NAME_FILE_FORMATS;
+        $lowercaseFilenamesOption = self::FIELD_NAME_LOWERCASE_FILENAMES;
         require_once YR3K_UPLOAD_PATH.'/views/form.settings.optimizer.php';
     }
 
@@ -184,7 +198,13 @@ class Yr3kUploaderAdmin
     public function admin_init()
     {
         foreach ($this->register as $name) {
-            register_setting(YR3K_UPLOAD_REGISTRATION_NAME, $name);
+            $args = [];
+
+            if (self::FIELD_NAME_FILE_FORMATS === $name) {
+                $args['sanitize_callback'] = [$this, 'sanitizeFileFormats'];
+            }
+
+            register_setting(YR3K_UPLOAD_REGISTRATION_NAME, $name, $args);
         }
 
         if (!isset($_GET['yr_rating_notice'])) {
@@ -195,5 +215,23 @@ class Yr3kUploaderAdmin
         $time = $rate === 1 ? '+7 days' : '+3 years';
 
         update_option(self::FIELD_NAME_SHOW_NOTICE, strtotime($time));
+    }
+
+    public function sanitizeFileFormats($value)
+    {
+        $value = trim(sanitize_text_field(wp_unslash($value)));
+
+        if (preg_match('/^[a-z0-9]+(\|[a-z0-9]+)*$/', $value)) {
+            return $value;
+        }
+
+        add_settings_error(
+            self::FIELD_NAME_FILE_FORMATS,
+            'yr-images-optimize-upload-file-formats-invalid',
+            esc_html(__('File formats must be lowercase extensions separated by a vertical bar. Example:', YR3K_UPLOAD_REGISTRATION_NAME)) . ' ' . YR3K_UPLOAD_DEFAULT_FILE_FORMATS,
+            'error'
+        );
+
+        return get_option(self::FIELD_NAME_FILE_FORMATS, YR3K_UPLOAD_DEFAULT_FILE_FORMATS);
     }
 }

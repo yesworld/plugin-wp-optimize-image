@@ -3,7 +3,7 @@ Contributors: yesworld, bruklig
 Tags: images, compression, contact form 7, drag and drop, multiple file
 Requires at least: 5.2.2
 Tested up to: 7.0
-Stable tag: 2.2.2
+Stable tag: 2.3.0
 Requires PHP: 5.2
 License: GNU GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -63,6 +63,10 @@ To install this plugin see below:
 3. Drag-n-Drop Field and File Attachment - Front End
 
 == Changelog ==
+
+= 2.3.0 =
+Added a plugin setting to edit allowed upload file extensions.
+Added an option to convert uploaded file names to lowercase before saving.
 
 = 2.2.3 =
 Fixed default value

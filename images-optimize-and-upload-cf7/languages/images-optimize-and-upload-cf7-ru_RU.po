@@ -64,6 +64,27 @@ msgstr "Images Optimize & Upload на GitHub"
 msgid "Images Optimize & Upload - Settings"
 msgstr "Images Optimize & Upload - Настройки"
 
+#: views/form.settings.optimizer.php:22
+msgid "File Formats"
+msgstr "Форматы файлов"
+
+#: views/form.settings.optimizer.php:25
+msgid "Enter lowercase file extensions separated by a vertical bar. File extension checks are case-insensitive."
+msgstr "Введите расширения файлов в нижнем регистре, разделяя их вертикальной чертой. Проверка расширений файлов нечувствительна к регистру."
+
+
+#: views/form.settings.optimizer.php:29
+msgid "Lowercase File Names"
+msgstr "Названия файлов в нижнем регистре"
+
+#: views/form.settings.optimizer.php:34
+msgid "Convert uploaded file names to lowercase before saving."
+msgstr "Перед сохранением преобразовать имена загруженных файлов в нижний регистр."
+
+#: views/form.settings.optimizer.php:36
+msgid "Enable this if your WordPress, server, or security settings reject files with uppercase extensions."
+msgstr "Включите эту опцию, если настройки вашего WordPress, сервера или безопасности отклоняют файлы с расширениями, написанными заглавными буквами."
+
 #: views/form.settings.optimizer.php:20
 msgid "Maximum Files"
 msgstr "Максимум файлов"
@@ -198,6 +219,18 @@ msgid ""
 msgstr ""
 "Показывать ли ошибки в консоли браузера, если размер итогового файла не был "
 "достигнут."
+
+#: views/form.settings.optimizer.php:109
+msgid "Remove Temp Files from Server"
+msgstr "Удалять временные файлы с сервера"
+
+#: views/form.settings.optimizer.php:109
+msgid "Whether the temporary files should be removed or saved on the server. If you want to keep the files on the server, use Contact Form 7 Database Addon – CFDB7 to access them."
+msgstr "Удалять ли временные файлы или сохранять их на сервере. Если вы хотите сохранить файлы на сервере, используйте дополнение Contact Form 7 Database Addon – CFDB7 для доступа к ним."
+
+#: views/form.settings.optimizer.php:109
+msgid "Temporary files location: /wp-content/uploads/wpcf7_upload_image"
+msgstr "Расположение временных файлов: /wp-content/uploads/wpcf7_upload_image"
 
 #: views/form.settings.optimizer.php:99
 msgid "Drag & Drop Area Template"
