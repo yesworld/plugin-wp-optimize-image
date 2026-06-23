@@ -2,6 +2,7 @@
 
 class Yr3kUploaderSettings
 {
+    private const OPTION_HEIC_SERVER_PROCESSING = 'yr-images-optimize-upload-heic-server-processing';
 
     public function __construct()
     {
@@ -28,5 +29,51 @@ class Yr3kUploaderSettings
             __('or', YR3K_UPLOAD_REGISTRATION_NAME),
             __('Browse Files', YR3K_UPLOAD_REGISTRATION_NAME)
         );
+    }
+
+    static function supportsHeicHeif()
+    {
+        if (!class_exists('Imagick')) {
+            return false;
+        }
+
+        try {
+            $formats = Imagick::queryFormats();
+        } catch (Exception $exception) {
+            return false;
+        }
+
+        $formats = array_map('strtoupper', $formats);
+
+        return !empty(array_intersect(['HEIC', 'HEIF'], $formats));
+    }
+
+    static function isHeicServerProcessingEnabled()
+    {
+        return 1 === (int) get_option(self::OPTION_HEIC_SERVER_PROCESSING, 0) && self::supportsHeicHeif();
+    }
+
+    static function getAllowedExtensions()
+    {
+        $extensions = array_unique(array_filter(array_map(function ($extension) {
+            return strtolower(ltrim(trim($extension), '.'));
+        }, explode('|', YR3K_UPLOAD_FILE_FORMATS))));
+
+        if (self::isHeicServerProcessingEnabled()) {
+            $extensions = array_merge($extensions, ['heic', 'heif']);
+        }
+
+        return array_values(array_unique($extensions));
+    }
+
+    static function getNumberOption($name, $default)
+    {
+        $value = get_option($name, $default);
+
+        if ('' === $value || null === $value || !is_numeric($value)) {
+            return $default;
+        }
+
+        return (float) $value;
     }
 }

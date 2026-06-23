@@ -64,6 +64,26 @@ msgstr "Images Optimize & Upload на GitHub"
 msgid "Images Optimize & Upload - Settings"
 msgstr "Images Optimize & Upload - Настройки"
 
+#: views/form.settings.optimizer.php:21
+msgid "HEIC/HEIF Support"
+msgstr "Поддержка HEIC/HEIF"
+
+#: views/form.settings.optimizer.php:24
+msgid "Supported"
+msgstr "Поддерживается"
+
+#: views/form.settings.optimizer.php:24
+msgid "Not supported by server settings"
+msgstr "Не поддерживается настройками сервера"
+
+#: views/form.settings.optimizer.php:29
+msgid "Process images of this type (Experimental feature)"
+msgstr "Обработка изображений данного типа (Экспериментальная функция)"
+
+#: views/form.settings.optimizer.php:32
+msgid "When this option is enabled, HEIC/HEIF files will be uploaded without client-side compression and processed on the server."
+msgstr "При включении этой опции файлы HEIC/HEIF будут загружаться без сжатия на стороне браузера и обрабатываться на сервере."
+
 #: views/form.settings.optimizer.php:22
 msgid "File Formats"
 msgstr "Форматы файлов"

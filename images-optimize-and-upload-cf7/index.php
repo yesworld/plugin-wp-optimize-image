@@ -6,9 +6,9 @@
  * Author URI: https://github.com/yesworld
  * Domain Path: /languages
  * License: GPL2
- * Version: 2.3.0
+ * Version: 2.3.1
  */
-define('YR3K_UPLOAD_VERSION', '2.3.0');
+define('YR3K_UPLOAD_VERSION', '2.3.1');
 define('YR3K_UPLOAD_BASENAME', plugin_basename(__FILE__));
 define('YR3K_UPLOAD_PATH', plugin_dir_path(__FILE__));
 define('YR3K_UPLOAD_REGISTRATION_NAME', dirname(YR3K_UPLOAD_BASENAME));

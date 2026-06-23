@@ -24,6 +24,7 @@ jQuery(document).ready(function($){
       maxHeight: getNumberOption(YR3K_UPLOADER_OPTIONS.maxHeight, 1920),
       resize: YR3K_UPLOADER_OPTIONS.resize == 1,
       throwIfSizeNotReached: YR3K_UPLOADER_OPTIONS.throwIfSizeNotReached == 1,
+      heicServerProcessing: YR3K_UPLOADER_OPTIONS.heicServerProcessing == 1,
       templatePreview: YR3K_UPLOADER_OPTIONS.templatePreview,
       templateDndArea: YR3K_UPLOADER_OPTIONS.templateDndArea,
     })

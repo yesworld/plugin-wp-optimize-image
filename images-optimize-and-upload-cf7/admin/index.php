@@ -51,9 +51,11 @@ class Yr3kUploaderAdmin
     private const FIELD_NAME_SHOW_NOTICE = 'yr-images-optimize-upload-do-not-show-rating-tip';
     private const FIELD_NAME_FILE_FORMATS = 'yr-images-optimize-upload-file-formats';
     private const FIELD_NAME_LOWERCASE_FILENAMES = 'yr-images-optimize-upload-lowercase-filenames';
+    private const FIELD_NAME_HEIC_SERVER_PROCESSING = 'yr-images-optimize-upload-heic-server-processing';
     private $register = [
         self::FIELD_NAME_FILE_FORMATS,
         self::FIELD_NAME_LOWERCASE_FILENAMES,
+        self::FIELD_NAME_HEIC_SERVER_PROCESSING,
         'yr-images-optimize-upload-targetSize',
         'yr-images-optimize-upload-quality',
         'yr-images-optimize-upload-minQuality',
@@ -158,6 +160,8 @@ class Yr3kUploaderAdmin
     {
         $fileFormatsOption = self::FIELD_NAME_FILE_FORMATS;
         $lowercaseFilenamesOption = self::FIELD_NAME_LOWERCASE_FILENAMES;
+        $heicProcessingOption = self::FIELD_NAME_HEIC_SERVER_PROCESSING;
+        $supportsHeicHeif = Yr3kUploaderSettings::supportsHeicHeif();
         require_once YR3K_UPLOAD_PATH.'/views/form.settings.optimizer.php';
     }
 
@@ -202,6 +206,10 @@ class Yr3kUploaderAdmin
 
             if (self::FIELD_NAME_FILE_FORMATS === $name) {
                 $args['sanitize_callback'] = [$this, 'sanitizeFileFormats'];
+            }
+
+            if (self::FIELD_NAME_HEIC_SERVER_PROCESSING === $name) {
+                $args['sanitize_callback'] = 'absint';
             }
 
             register_setting(YR3K_UPLOAD_REGISTRATION_NAME, $name, $args);

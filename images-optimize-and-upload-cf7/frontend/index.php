@@ -260,15 +260,16 @@ class Yr3kUploaderFrontend
             [
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce(YR3K_UPLOAD_AJAX_NONCE),
-                'targetSize' => $this->getNumberOption('yr-images-optimize-upload-targetSize', 0.25),
-                'quality' => $this->getNumberOption('yr-images-optimize-upload-quality', 0.75),
-                'minQuality' => $this->getNumberOption('yr-images-optimize-upload-minQuality', 0.5),
-                'qualityStepSize' => $this->getNumberOption('yr-images-optimize-upload-qualityStepSize', 0.1),
-                'maxWidth' => $this->getNumberOption('yr-images-optimize-upload-maxWidth', 1920),
-                'maxHeight' => $this->getNumberOption('yr-images-optimize-upload-maxHeight', 1920),
+                'targetSize' => Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-targetSize', 0.25),
+                'quality' => Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-quality', 0.75),
+                'minQuality' => Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-minQuality', 0.5),
+                'qualityStepSize' => Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-qualityStepSize', 0.1),
+                'maxWidth' => Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-maxWidth', 1920),
+                'maxHeight' => Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-maxHeight', 1920),
                 'resize' => get_option('yr-images-optimize-upload-resize', 1),
                 'throwIfSizeNotReached' => get_option('yr-images-optimize-upload-throwIfSizeNotReached', 0),
-                'formatFile' => YR3K_UPLOAD_FILE_FORMATS,
+                'formatFile' => implode('|', Yr3kUploaderSettings::getAllowedExtensions()),
+                'heicServerProcessing' => Yr3kUploaderSettings::isHeicServerProcessingEnabled() ? 1 : 0,
                 'templatePreview' => get_option('yr-images-optimize-upload-template', Yr3kUploaderSettings::getTemplatePreview()),
                 'templateDndArea' => get_option('yr-images-optimize-upload-template-dnd', Yr3kUploaderSettings::getTemplateDndArea()),
                 'language' => [
@@ -287,25 +288,6 @@ class Yr3kUploaderFrontend
             '',
             YR3K_UPLOAD_VERSION
         );
-    }
-
-    /**
-     * Read a numeric option, treating empty saved values like missing defaults.
-     *
-     * @param string $name
-     * @param float|int $default
-     *
-     * @return float|int
-     */
-    private function getNumberOption($name, $default)
-    {
-        $value = get_option($name, $default);
-
-        if ('' === $value || null === $value || !is_numeric($value)) {
-            return $default;
-        }
-
-        return (float) $value;
     }
 
     /**
@@ -419,12 +401,8 @@ class Yr3kUploaderFrontend
      */
     private function getAcceptFormats()
     {
-        $extensions = array_unique(array_filter(array_map(function ($extension) {
-            return strtolower(ltrim(trim($extension), '.'));
-        }, explode('|', YR3K_UPLOAD_FILE_FORMATS))));
-
         return implode(',', array_map(function ($extension) {
             return '.' . $extension;
-        }, $extensions));
+        }, Yr3kUploaderSettings::getAllowedExtensions()));
     }
 }

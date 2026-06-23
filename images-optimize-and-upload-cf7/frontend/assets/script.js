@@ -12,6 +12,7 @@ jQuery(document).ready(function ($) {
 
       ajax_url: YR3K_UPLOADER_OPTIONS.ajax_url,
       formatFile: new RegExp('\\.(' + YR3K_UPLOADER_OPTIONS.formatFile + ')$', 'i'),
+      heicFormat: /\.(heic|heif)$/i,
 
       targetSize: 0.25,
       quality: 0.75,
@@ -22,6 +23,7 @@ jQuery(document).ready(function ($) {
       resize: true,
       throwIfSizeNotReached: false,
       autoRotate: true,
+      heicServerProcessing: false,
 
       templatePreview: '',
       templateDndArea: '',
@@ -130,8 +132,19 @@ jQuery(document).ready(function ($) {
       errorHandler() //hide error
 
       const formData = new FormData
-      compress
-        .compress(images)
+      let clientImages = [];
+      let serverImages = [];
+
+      for (let i = 0; i < images.length; i++) {
+        if (isServerProcessedHeic(images[i])) {
+          serverImages.push(images[i]);
+        } else {
+          clientImages.push(images[i]);
+        }
+      }
+
+      const compressPromise = clientImages.length ? compress.compress(clientImages) : Promise.resolve([]);
+      compressPromise
         .then((conversions) => {
           let uploadKeys = [];
 
@@ -140,15 +153,22 @@ jQuery(document).ready(function ($) {
             let photo = conversions[i].photo
             let info = conversions[i].info
 
-            // Create an object URL which points to the photo Blob data
-            const objectUrl = URL.createObjectURL(photo.data)
-
             let randomString = getRandomString();
             uploadKeys.push(randomString);
 
             // create Li and append to list UL
-            createLiHtml(objectUrl, photo, info, randomString);
+            createLiHtml(URL.createObjectURL(photo.data), photo, info, randomString);
             formData.append('upload-image[]', photo.data, photo.name)
+            formData.append('upload-image-key[]', randomString)
+          }
+
+          for (let i = 0; serverImages.length > i; i++) {
+            let file = serverImages[i];
+            let randomString = getRandomString();
+            uploadKeys.push(randomString);
+
+            createLiHtml(null, file, getOriginalFileInfo(file), randomString);
+            formData.append('upload-image[]', file, file.name)
             formData.append('upload-image-key[]', randomString)
           }
 
@@ -157,6 +177,11 @@ jQuery(document).ready(function ($) {
           formData.append("nonce", YR3K_UPLOADER_OPTIONS.nonce);
           formData.append("upload_token", th.data('upload-token'));
           send(formData, uploadKeys)
+        })
+        .catch(() => {
+          disableForm(false);
+          countImages = Math.max(0, countImages - images.length);
+          errorHandler(setting.upload_error);
         })
 
       emptyUpload()
@@ -228,7 +253,13 @@ jQuery(document).ready(function ($) {
           for (let i = 0; i < res.data.length; i++) {
             let key = res.data[i].key;
             let value = res.data[i].temp + '/' + res.data[i].value;
-            $list.find('li.yr3k-' + key)
+            let $li = $list.find('li.yr3k-' + key);
+
+            if (res.data[i].info) {
+              updateLiHtml($li, res.data[i]);
+            }
+
+            $li
               .append('<input type="hidden" name="' + NAME_TAG + '[]" value="' + value + '">')
               .show();
           }
@@ -286,25 +317,65 @@ jQuery(document).ready(function ($) {
      * @param randomClassName
      */
     function createLiHtml(objectUrl, photo, info, randomClassName) {
-      let previewImg = document.createElement('img')
-
-      // Set the preview img src to the object URL and wait for it to load
-      Compress
-        .loadImageElement(previewImg, objectUrl)
-        .then(() => {
-          // Revoke the object URL to free up memory
-          URL.revokeObjectURL(objectUrl)
-        })
-
       let html = getTemplateLi(info, photo.name);
 
       let $li = $('<li>')
         .hide()
         .addClass('yr3k-' + randomClassName)
         .html(html)
-        .prepend('<div class="thumbnail">' + previewImg.outerHTML + '</div>')
+
+      if (objectUrl) {
+        prependPreview($li, objectUrl, true)
+      }
 
       $list.append($li)
+    }
+
+    function updateLiHtml($li, data) {
+      $li.html(getTemplateLi(normalizeInfo(data.info), data.name || data.value));
+
+      if (data.preview_url) {
+        prependPreview($li, data.preview_url, false)
+      }
+    }
+
+    function prependPreview($li, src, revoke) {
+      let previewImg = document.createElement('img')
+
+      Compress
+        .loadImageElement(previewImg, src)
+        .then(() => {
+          if (revoke) {
+            URL.revokeObjectURL(src)
+          }
+        })
+
+      $li.find('.thumbnail').remove()
+      $li.prepend('<div class="thumbnail">' + previewImg.outerHTML + '</div>')
+    }
+
+    function normalizeInfo(info) {
+      return {
+        startSizeMB: Number(info.startSizeMB),
+        endSizeMB: Number(info.endSizeMB),
+        startWidth: Number(info.startWidth),
+        startHeight: Number(info.startHeight),
+        endWidth: Number(info.endWidth),
+        endHeight: Number(info.endHeight),
+      };
+    }
+
+    function getOriginalFileInfo(file) {
+      let sizeMB = file.size * 0.000001;
+
+      return {
+        startSizeMB: sizeMB,
+        endSizeMB: sizeMB,
+        startWidth: 0,
+        startHeight: 0,
+        endWidth: 0,
+        endHeight: 0,
+      };
     }
 
     function getTemplateLi(info, photoName) {
@@ -334,13 +405,21 @@ jQuery(document).ready(function ($) {
       for (let i = 0, img; img = images[i]; i++) {
 
         // Only process image files.
-        if (!img.type.match('image') || !img.name.match(allowFormat)) {
+        if (!img.name.match(allowFormat)) {
+          return false;
+        }
+
+        if (!img.type.match('image') && !isServerProcessedHeic(img)) {
           return false;
         }
 
         result.push(img)
       }
       return result;
+    }
+
+    function isServerProcessedHeic(file) {
+      return setting.heicServerProcessing && file.name.match(setting.heicFormat);
     }
   }
 })

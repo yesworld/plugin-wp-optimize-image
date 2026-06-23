@@ -3,7 +3,7 @@ Contributors: yesworld, bruklig
 Tags: images, compression, contact form 7, drag and drop, multiple file
 Requires at least: 5.2.2
 Tested up to: 7.0
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 Requires PHP: 5.2
 License: GNU GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -17,6 +17,7 @@ Tested with Contact Form 7 version 6.1.6
 
 = Features =
 
+* Experimental HEIC/HEIF server-side processing via Imagick. Available only when your server's ImageMagick installation includes HEIC/HEIF format support.
 * Quick compression on the client's side
 * Save data by compressing it on the client's side before sending to the server
 * Automatically resize images to max 1920px (width or height)
@@ -63,6 +64,9 @@ To install this plugin see below:
 3. Drag-n-Drop Field and File Attachment - Front End
 
 == Changelog ==
+
+= 2.3.1 =
+Added an experimental HEIC/HEIF server-side processing option for servers that support these formats through Imagick.
 
 = 2.3.0 =
 Added a plugin setting to edit allowed upload file extensions.

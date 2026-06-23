@@ -1,9 +1,9 @@
 <?php
 echo '<div class="wrap">';
 echo '<h1>'; ?><?php echo esc_html(__('Images Optimize & Upload - Settings', YR3K_UPLOAD_REGISTRATION_NAME)); ?><?php echo '</h1>';
-settings_errors($fileFormatsOption);
 echo '<form method="post" action="options.php">';
-
+$heicProcessing = get_option($heicProcessingOption, 0);
+settings_errors($fileFormatsOption);
 $htmlAttrSelected = 'selected="selected"';
 
 $selectedResize = get_option('yr-images-optimize-upload-resize', true);
@@ -19,12 +19,29 @@ do_settings_sections(YR3K_UPLOAD_REGISTRATION_NAME);
 ?>
 <table class="form-table">
   <tr>
-    <th scope="row"><label for="<?php echo esc_attr($fileFormatsOption); ?>"><?php echo esc_html(__('File Formats', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
+      <th scope="row"><label for="<?php echo esc_attr($fileFormatsOption); ?>"><?php echo esc_html(__('File Formats', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
       <td>
         <input name="<?php echo esc_attr($fileFormatsOption); ?>" id="<?php echo esc_attr($fileFormatsOption); ?>" type="text" placeholder="<?php echo esc_attr(YR3K_UPLOAD_DEFAULT_FILE_FORMATS); ?>" value="<?php echo esc_attr(get_option($fileFormatsOption, YR3K_UPLOAD_DEFAULT_FILE_FORMATS)); ?>" class="regular-text">
         <p class="description"><?php echo esc_html(__('Enter lowercase file extensions separated by a vertical bar. File extension checks are case-insensitive.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
       </td>
   </tr>
+
+  <tr>
+    <th scope="row"><label for="<?php echo esc_attr($heicProcessingOption); ?>"><?php echo esc_html(__('HEIC/HEIF Support', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
+      <td>
+        <p><?php echo esc_html($supportsHeicHeif ? __('Supported', YR3K_UPLOAD_REGISTRATION_NAME) : __('Not supported by server settings', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
+        <br/>
+        <?php if ($supportsHeicHeif) : ?>
+          <input type="hidden" name="<?php echo esc_attr($heicProcessingOption); ?>" value="0">
+          <label for="<?php echo esc_attr($heicProcessingOption); ?>">
+            <input name="<?php echo esc_attr($heicProcessingOption); ?>" id="<?php echo esc_attr($heicProcessingOption); ?>" type="checkbox" value="1" <?php checked(1, $heicProcessing); ?>>
+            <?php echo esc_html(__('Process images of this type (Experimental feature)', YR3K_UPLOAD_REGISTRATION_NAME)); ?>
+          </label>
+          <p class="description">⚠️ <?php echo esc_html(__('When this option is enabled, HEIC/HEIF files will be uploaded without client-side compression and processed on the server.', YR3K_UPLOAD_REGISTRATION_NAME)); ?></p>
+        <?php endif; ?>
+      </td>
+  </tr>
+
   <tr>
     <th scope="row"><label for="<?php echo esc_attr($lowercaseFilenamesOption); ?>"><?php echo esc_html(__('Lowercase File Names', YR3K_UPLOAD_REGISTRATION_NAME)); ?></label></th>
       <td>

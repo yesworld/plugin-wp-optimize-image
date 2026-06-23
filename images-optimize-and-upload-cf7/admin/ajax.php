@@ -5,16 +5,12 @@ class Yr3kUploaderApi
     const KEY_FILES = 'upload-image';
     const KEY_FILES_CLASS_NAME = 'upload-image-key';
 
-    private $preg_pattern_img;
-
     /**
      * Initialize hooks
      * Yr3kUploaderApi constructor.
      */
     public function __construct()
     {
-        $this->preg_pattern_img = explode('|', YR3K_UPLOAD_FILE_FORMATS);
-
         // Ajax Upload Images
         add_action('wp_ajax_yr_api_uploader', [$this, 'upload']);
         add_action('wp_ajax_nopriv_yr_api_uploader', [$this, 'upload']);
@@ -49,12 +45,16 @@ class Yr3kUploaderApi
         foreach ($files as $k => $file) {
 
             $this->validateUploadedFile($file);
+            $serverProcessedHeic = $this->shouldProcessHeicOnServer($file);
 
             // Check and create file name
             $originalName = sanitize_text_field(wp_unslash($file['name']));
             $filename = wpcf7_canonicalize($originalName, 'as-is');
             $filename = sanitize_file_name($filename);
             $filename = wpcf7_antiscript_file_name($filename);
+            if ($serverProcessedHeic) {
+                $filename = pathinfo($filename, PATHINFO_FILENAME) . '.jpg';
+            }
 
             // Add filter on upload file name
             $filename = apply_filters('wpcf7_upload_file_name', $filename, $originalName);
@@ -69,17 +69,33 @@ class Yr3kUploaderApi
             $new_file = path_join($uploads_dir, $filename);
 
             // Upload File
-            if (false === move_uploaded_file($file['tmp_name'], $new_file)) {
+            $heicInfo = null;
+            if ($serverProcessedHeic) {
+                $heicInfo = $this->processHeicFile($file['tmp_name'], $new_file);
+                $uploaded = false !== $heicInfo;
+            } else {
+                $uploaded = move_uploaded_file($file['tmp_name'], $new_file);
+            }
+
+            if (false === $uploaded) {
                 wp_send_json_error(wpcf7_get_message('upload_failed'));
 
                 return;
             }
 
-            $json[] = [
+            $item = [
                 'key' => $file['key'],
                 'temp' => $randomFolder,
                 'value' => str_replace('/', '-', $filename),
             ];
+
+            if ($serverProcessedHeic) {
+                $item['info'] = $heicInfo;
+                $item['preview_url'] = $this->getTempFileUrl($randomFolder, $filename);
+                $item['name'] = $originalName;
+            }
+
+            $json[] = $item;
 
             chmod($new_file, 0644);
         }
@@ -175,7 +191,7 @@ class Yr3kUploaderApi
         $originalName = isset($file['name']) ? sanitize_text_field(wp_unslash($file['name'])) : '';
         $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
 
-        if ('' === $extension || !in_array($extension, $this->getAllowedExtensions(), true)) {
+        if ('' === $extension || !in_array($extension, Yr3kUploaderSettings::getAllowedExtensions(), true)) {
             wp_send_json_error(YR3K_UPLOAD_ERRORS['incorrect_type'], 400);
         }
 
@@ -183,16 +199,6 @@ class Yr3kUploaderApi
         if (!$mime || 0 !== strpos($mime, 'image/')) {
             wp_send_json_error(YR3K_UPLOAD_ERRORS['incorrect_type'], 400);
         }
-    }
-
-    /**
-     * Return the normalized extension allowlist from plugin settings.
-     *
-     * @return array
-     */
-    private function getAllowedExtensions()
-    {
-        return array_filter(array_map('strtolower', array_map('trim', $this->preg_pattern_img)));
     }
 
     /**
@@ -214,5 +220,113 @@ class Yr3kUploaderApi
         }
 
         return false;
+    }
+
+    private function shouldProcessHeicOnServer($file)
+    {
+        if (!Yr3kUploaderSettings::isHeicServerProcessingEnabled()) {
+            return false;
+        }
+
+        $originalName = isset($file['name']) ? sanitize_text_field(wp_unslash($file['name'])) : '';
+        $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+
+        return in_array($extension, ['heic', 'heif'], true);
+    }
+
+    private function processHeicFile($source, $destination)
+    {
+        try {
+            $image = new Imagick();
+            $image->readImage($source);
+            $image->setIteratorIndex(0);
+
+            if (method_exists($image, 'autoOrient')) {
+                $image->autoOrient();
+            } elseif (method_exists($image, 'autoOrientImage')) {
+                $image->autoOrientImage();
+            }
+
+            $info = [
+                'startSizeMB' => filesize($source) * 0.000001,
+                'startWidth' => (int) $image->getImageWidth(),
+                'startHeight' => (int) $image->getImageHeight(),
+            ];
+
+            $this->resizeImage($image);
+            $image->setImageFormat('jpeg');
+            $image->setImageCompression(Imagick::COMPRESSION_JPEG);
+            $image->stripImage();
+
+            $written = $this->writeCompressedJpeg($image, $destination);
+            if (!$written) {
+                $image->clear();
+                return false;
+            }
+
+            $info['endSizeMB'] = filesize($destination) * 0.000001;
+            $info['endWidth'] = (int) $image->getImageWidth();
+            $info['endHeight'] = (int) $image->getImageHeight();
+
+            $image->clear();
+
+            return $info;
+        } catch (Exception $exception) {
+            return false;
+        }
+    }
+
+    private function resizeImage(Imagick $image)
+    {
+        if (1 !== (int) get_option('yr-images-optimize-upload-resize', 1)) {
+            return;
+        }
+
+        $width = (int) $image->getImageWidth();
+        $height = (int) $image->getImageHeight();
+        $maxWidth = (int) Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-maxWidth', 1920);
+        $maxHeight = (int) Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-maxHeight', 1920);
+
+        if ($width <= 0 || $height <= 0 || $maxWidth <= 0 || $maxHeight <= 0 || ($width <= $maxWidth && $height <= $maxHeight)) {
+            return;
+        }
+
+        $ratio = min($maxWidth / $width, $maxHeight / $height);
+        $newWidth = max(1, (int) round($width * $ratio));
+        $newHeight = max(1, (int) round($height * $ratio));
+
+        $image->resizeImage($newWidth, $newHeight, Imagick::FILTER_LANCZOS, 1);
+    }
+
+    private function writeCompressedJpeg(Imagick $image, $destination)
+    {
+        $quality = (int) round(Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-quality', 0.75) * 100);
+        $minQuality = (int) round(Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-minQuality', 0.5) * 100);
+        $step = (int) round(Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-qualityStepSize', 0.1) * 100);
+        $targetSize = Yr3kUploaderSettings::getNumberOption('yr-images-optimize-upload-targetSize', 0.25) * 1000000;
+
+        $quality = min(100, max(1, $quality));
+        $minQuality = min($quality, max(1, $minQuality));
+        $step = max(1, $step);
+
+        do {
+            $image->setImageCompressionQuality($quality);
+            $blob = $image->getImagesBlob();
+
+            if (false === file_put_contents($destination, $blob)) {
+                return false;
+            }
+
+            if ($targetSize <= 0 || filesize($destination) <= $targetSize || $quality <= $minQuality) {
+                return true;
+            }
+
+            $quality = max($minQuality, $quality - $step);
+        } while (true);
+    }
+
+    private function getTempFileUrl($folder, $filename)
+    {
+        return trailingslashit(YR3K_UPLOAD_BASEURL) . rawurlencode($folder) . '/' . rawurlencode($filename);
     }
 }
