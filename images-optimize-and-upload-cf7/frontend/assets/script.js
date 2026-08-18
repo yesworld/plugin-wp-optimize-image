@@ -2,18 +2,17 @@ jQuery(document).ready(function ($) {
 
   $.fn.Optimizer3k = function (options) {
     let language = YR3K_UPLOADER_OPTIONS.language;
-
     let setting = $.extend({
       info_file_origin: language.info_file_origin,
       info_file_compress: language.info_file_compress,
       wrong_format: language.wrong_format,
       info_file_delete: language.info_file_delete,
-      upload_error: language.upload_error || 'There was an error uploading the file. Please refresh the page and try again.',
+      heic_skipped: language.heic_skipped || 'HEIC/HEIF was not added because server-side processing is unavailable.',
+      browser_unsupported: language.browser_unsupported || 'This browser cannot prepare compressed files for form submission.',
+      preparing: language.preparing || 'Preparing images…',
 
-      ajax_url: YR3K_UPLOADER_OPTIONS.ajax_url,
       formatFile: new RegExp('\\.(' + YR3K_UPLOADER_OPTIONS.formatFile + ')$', 'i'),
       heicFormat: /\.(heic|heif)$/i,
-
       targetSize: 0.25,
       quality: 0.75,
       minQuality: 0.5,
@@ -24,350 +23,325 @@ jQuery(document).ready(function ($) {
       throwIfSizeNotReached: false,
       autoRotate: true,
       heicServerProcessing: false,
-
       templatePreview: '',
       templateDndArea: '',
-    }, options)
+    }, options);
 
-    let MAXFILE = +this.attr('max-file')
-    let NAME_TAG = $(this).data('name')
-    let txtErrorMaxFiles = this.attr('max-file-error')
-    let txtErrorFormat = setting.wrong_format
-
-    let th = this
-    let ID = this.attr('id') ? this.attr('id') : 0
-
-    let countImages = 0;
+    let MAXFILE = +this.attr('max-file');
+    let txtErrorMaxFiles = this.attr('max-file-error');
+    let th = this;
+    let selectedFiles = [];
+    let isPreparing = false;
 
     let bodyHTML = '<div class="images-optimize-upload-handler"><div class="images-optimize-upload-container"><div class="images-optimize-upload-inner">' + setting.templateDndArea + '</div></div></div>';
     this.wrapAll('<div class="images-optimize-upload-wrapper"></div>');
 
     let $dropZone = this.parents('.images-optimize-upload-wrapper');
     let $errorMessage = $('<div class="images-optimize-upload-error" role="alert">').hide();
-
-    let $form = this.parents("form");
+    let $form = this.parents('form');
     let $btnSubmit = $('input.wpcf7-submit', $form);
 
     this.after(bodyHTML);
 
     let $list = $('<ul class="list"></ul>');
-    $dropZone
-      .append($list)
-      .append($errorMessage);
+    $dropZone.append($list).append($errorMessage);
 
-    const compress = new Compress(setting)
+    const compress = new Compress(setting);
 
-    /* Initialize Events */
     initEvents();
 
     function initEvents() {
       $dropZone.find('.images-optimize-upload-handler')
-        .on("drag dragstart dragend dragover dragenter dragleave drop", function (e) {
+        .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
           e.preventDefault();
           e.stopPropagation();
         })
-        .on("dragover dragenter", function () {
-          $(this).addClass("hover")
+        .on('dragover dragenter', function () {
+          $(this).addClass('hover');
         })
-        .on("dragleave dragend drop", function () {
-          $(this).removeClass("hover")
+        .on('dragleave dragend drop', function () {
+          $(this).removeClass('hover');
         })
-        .on("drop", function (e) {
-          upload(e.originalEvent.dataTransfer.files)
-        })
-      ;
+        .on('drop', function (e) {
+          prepareFilesForSubmission(e.originalEvent.dataTransfer.files);
+        });
 
-      $dropZone.find('a.images-optimize-upload-button').on("click", function (e) {
+      $dropZone.find('a.images-optimize-upload-button').on('click', function (e) {
         e.preventDefault();
-        th.trigger('click')
+        th.trigger('click');
       });
 
-      // click button to load images
-      th.on("change", function (e) {
-        upload(this.files)
+      th.on('change', function () {
+        prepareFilesForSubmission(this.files);
       });
 
-      // click to remove image
       $list.on('click', 'li del', function () {
-        let $li = $(this).parent();
-        $li.find('input[type="hidden"]').val('')
-        $li.remove();
-        countImages--
-        errorHandler() //hide error
+        let key = $(this).parent().attr('data-upload-key');
+        selectedFiles = selectedFiles.filter(function (item) {
+          return item.key !== key;
+        });
+        $(this).parent().remove();
+        syncInputFiles();
+        errorHandler();
       });
 
-      // callback success send
+      $form.on('submit', function (event) {
+        if (isPreparing || !syncInputFiles()) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          errorHandler(isPreparing ? setting.preparing : setting.browser_unsupported);
+          return false;
+        }
+      });
+
       document.addEventListener('wpcf7mailsent', function () {
-        $list.empty();
-        errorHandler() //hide error
-        countImages = 0
+        resetFiles();
       }, false);
     }
 
     /**
-     * Uploading images
-     * @param images
+     * Compress browser-supported images and keep the resulting File objects in
+     * the real multipart file input. Nothing is uploaded before CF7 submit.
      */
-    function upload(images) {
-      if (!images.length) return;
-
-      if (countImages + images.length > MAXFILE) {
-        errorHandler(txtErrorMaxFiles) //show error
-        th.get(0).value = ''
+    function prepareFilesForSubmission(images) {
+      if (!images || !images.length) {
         return;
       }
 
-      // checks files
-      images = prepareFiles(images);
-      if (!images) {
-        emptyUpload()
-        errorHandler(txtErrorFormat) // show error
+      if (!canPopulateInputFiles()) {
+        restoreInputFiles();
+        errorHandler(setting.browser_unsupported);
         return;
       }
 
-      // temporarily disabled the form
+      let prepared = prepareFiles(images);
+      if (!prepared.files.length) {
+        restoreInputFiles();
+        if (prepared.invalid) {
+          errorHandler(setting.wrong_format);
+        } else if (prepared.skippedHeic) {
+          errorHandler(setting.heic_skipped);
+        }
+        return;
+      }
+
+      if (selectedFiles.length + prepared.files.length > MAXFILE) {
+        restoreInputFiles();
+        errorHandler(txtErrorMaxFiles);
+        return;
+      }
+
+      if (prepared.invalid) {
+        restoreInputFiles();
+        errorHandler(setting.wrong_format);
+        return;
+      }
+
+      isPreparing = true;
       disableForm(true);
+      errorHandler(setting.preparing);
 
-      countImages += images.length
-      errorHandler() //hide error
-
-      const formData = new FormData
       let clientImages = [];
       let serverImages = [];
-
-      for (let i = 0; i < images.length; i++) {
-        if (isServerProcessedHeic(images[i])) {
-          serverImages.push(images[i]);
+      prepared.files.forEach(function (file) {
+        if (isServerProcessedHeic(file)) {
+          serverImages.push(file);
         } else {
-          clientImages.push(images[i]);
+          clientImages.push(file);
         }
-      }
+      });
 
-      const compressPromise = clientImages.length ? compress.compress(clientImages) : Promise.resolve([]);
+      let compressPromise = clientImages.length ? compress.compress(clientImages) : Promise.resolve([]);
       compressPromise
-        .then((conversions) => {
-          let uploadKeys = [];
+        .then(function (conversions) {
+          let additions = [];
 
-          for (let i = 0; conversions.length > i; i++) {
-
-            let photo = conversions[i].photo
-            let info = conversions[i].info
-
-            let randomString = getRandomString();
-            uploadKeys.push(randomString);
-
-            // create Li and append to list UL
-            createLiHtml(URL.createObjectURL(photo.data), photo, info, randomString);
-            formData.append('upload-image[]', photo.data, photo.name)
-            formData.append('upload-image-key[]', randomString)
-          }
-
-          for (let i = 0; serverImages.length > i; i++) {
-            let file = serverImages[i];
-            let randomString = getRandomString();
-            uploadKeys.push(randomString);
-
-            createLiHtml(null, file, getOriginalFileInfo(file), randomString);
-            formData.append('upload-image[]', file, file.name)
-            formData.append('upload-image-key[]', randomString)
-          }
-
-          formData.append("action", "yr_api_uploader");
-          formData.append("id", ID);
-          formData.append("nonce", YR3K_UPLOADER_OPTIONS.nonce);
-          formData.append("upload_token", th.data('upload-token'));
-          send(formData, uploadKeys)
-        })
-        .catch(() => {
-          disableForm(false);
-          countImages = Math.max(0, countImages - images.length);
-          errorHandler(setting.upload_error);
-        })
-
-      emptyUpload()
-    }
-
-    /**
-     * Display an error
-     * @param txt
-     */
-    function errorHandler(txt) {
-      if (txt) {
-        $errorMessage.html(txt).show()
-      } else {
-        $errorMessage.empty().hide()
-      }
-    }
-
-    /**
-     * Clear images from form
-     */
-    function emptyUpload() {
-      th.empty()
-      th.get(0).value = ''
-    }
-
-    /**
-     * Generate a random string
-     * @return {string}
-     */
-    function getRandomString() {
-      return Math.random().toString(36).substr(2, 9)
-    }
-
-    /**
-     * Temporarily disable the submit button of the form
-     * @param disabled
-     */
-    function disableForm(disabled) {
-      $btnSubmit.prop('disabled', disabled);
-      if (disabled) {
-        $btnSubmit.addClass('disabled')
-      } else {
-        $btnSubmit.removeClass('disabled')
-      }
-    }
-
-    /**
-     * Send images into the Server
-     * @param data
-     * @param uploadKeys
-     */
-    function send(data, uploadKeys) {
-      $.ajax({
-        url: setting.ajax_url,
-        type: 'post',
-        data: data,
-        dataType: 'json',
-        cache: false,
-        contentType: false,
-        processData: false,
-        success: function (res) {
-          disableForm(false);
-
-          if (!res.success) {
-            handleUploadError(getUploadErrorMessage(res), uploadKeys);
-            return;
-          }
-
-          for (let i = 0; i < res.data.length; i++) {
-            let key = res.data[i].key;
-            let value = res.data[i].temp + '/' + res.data[i].value;
-            let $li = $list.find('li.yr3k-' + key);
-
-            if (res.data[i].info) {
-              updateLiHtml($li, res.data[i]);
+          conversions.forEach(function (conversion) {
+            let photo = conversion.photo;
+            let file = createFile(photo.data, photo.name);
+            if (!file) {
+              throw new Error(setting.browser_unsupported);
             }
 
-            $li
-              .append('<input type="hidden" name="' + NAME_TAG + '[]" value="' + value + '">')
-              .show();
+            additions.push({
+              key: getRandomString(),
+              file: file,
+              info: conversion.info,
+              preview: URL.createObjectURL(file),
+              format: '',
+            });
+          });
+
+          serverImages.forEach(function (file) {
+            additions.push({
+              key: getRandomString(),
+              file: file,
+              info: getOriginalFileInfo(file),
+              preview: null,
+              format: getHeicFormat(file),
+            });
+          });
+
+          additions.forEach(function (item) {
+            selectedFiles.push(item);
+            createLiHtml(item.preview, item.file, item.info, item.key, item.format);
+          });
+
+          if (!syncInputFiles()) {
+            additions.forEach(function (item) {
+              $list.find('li[data-upload-key="' + item.key + '"]').remove();
+            });
+            selectedFiles = selectedFiles.filter(function (item) {
+              return additions.indexOf(item) === -1;
+            });
+            throw new Error(setting.browser_unsupported);
           }
-        },
-        error: function (xhr) {
+
+          errorHandler(prepared.skippedHeic ? setting.heic_skipped : '');
+        })
+        .catch(function (error) {
+          restoreInputFiles();
+          errorHandler(error && error.message ? error.message : setting.wrong_format);
+        })
+        .finally(function () {
+          isPreparing = false;
           disableForm(false);
-          handleUploadError(getUploadErrorMessage(xhr.responseJSON), uploadKeys);
+        });
+    }
+
+    function prepareFiles(images) {
+      let result = [];
+      let skippedHeic = false;
+      let invalid = false;
+
+      for (let i = 0; i < images.length; i++) {
+        let image = images[i];
+        if (isHeic(image) && !isServerProcessedHeic(image)) {
+          skippedHeic = true;
+          continue;
         }
-      })
-    }
 
-    /**
-     * Roll back failed upload previews and show a useful error.
-     * @param message
-     * @param uploadKeys
-     */
-    function handleUploadError(message, uploadKeys) {
-      if (Array.isArray(uploadKeys)) {
-        for (let i = 0; i < uploadKeys.length; i++) {
-          $list.find('li.yr3k-' + uploadKeys[i]).remove();
+        if (!image.name.match(setting.formatFile) || (!image.type.match('image') && !isServerProcessedHeic(image))) {
+          invalid = true;
+          continue;
         }
 
-        countImages = Math.max(0, countImages - uploadKeys.length);
+        result.push(image);
       }
 
-      errorHandler(message || setting.upload_error);
+      return {
+        files: result,
+        skippedHeic: skippedHeic,
+        invalid: invalid,
+      };
     }
 
-    /**
-     * Extract a readable upload error from a WordPress JSON response.
-     * @param response
-     * @return {string}
-     */
-    function getUploadErrorMessage(response) {
-      if (!response || !response.data) {
-        return setting.upload_error;
+    function canPopulateInputFiles() {
+      try {
+        let transfer = new DataTransfer();
+        return !!transfer.items && typeof transfer.items.add === 'function';
+      } catch (error) {
+        return false;
       }
-
-      if (typeof response.data === 'string') {
-        return response.data;
-      }
-
-      if (response.data.message) {
-        return response.data.message;
-      }
-
-      return setting.upload_error;
     }
 
-    /**
-     * Create images preview
-     * @param objectUrl
-     * @param photo
-     * @param info
-     * @param randomClassName
-     */
-    function createLiHtml(objectUrl, photo, info, randomClassName) {
+    function syncInputFiles() {
+      if (!canPopulateInputFiles()) {
+        return false;
+      }
+
+      try {
+        let transfer = new DataTransfer();
+        selectedFiles.forEach(function (item) {
+          transfer.items.add(item.file);
+        });
+        th.get(0).files = transfer.files;
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function restoreInputFiles() {
+      if (!selectedFiles.length || !syncInputFiles()) {
+        th.get(0).value = '';
+      }
+    }
+
+    function createFile(data, name) {
+      try {
+        if (data instanceof File) {
+          return data;
+        }
+
+        return new File([data], name, {
+          type: data.type || 'image/jpeg',
+          lastModified: Date.now(),
+        });
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function resetFiles() {
+      selectedFiles = [];
+      $list.empty();
+      th.get(0).value = '';
+      errorHandler();
+    }
+
+    function errorHandler(text) {
+      if (text) {
+        $errorMessage.text(text).show();
+      } else {
+        $errorMessage.empty().hide();
+      }
+    }
+
+    function getRandomString() {
+      return Math.random().toString(36).substr(2, 9);
+    }
+
+    function disableForm(disabled) {
+      $btnSubmit.prop('disabled', disabled);
+      $btnSubmit.toggleClass('disabled', disabled);
+    }
+
+    function createLiHtml(objectUrl, photo, info, previewKey, format) {
       let html = getTemplateLi(info, photo.name);
-
       let $li = $('<li>')
-        .hide()
-        .addClass('yr3k-' + randomClassName)
-        .html(html)
+        .attr('data-upload-key', previewKey)
+        .html(html);
 
       if (objectUrl) {
-        prependPreview($li, objectUrl, true)
+        prependPreview($li, objectUrl);
+      } else if (format) {
+        prependFormatPreview($li, format);
       }
 
-      $list.append($li)
+      $list.append($li);
     }
 
-    function updateLiHtml($li, data) {
-      $li.html(getTemplateLi(normalizeInfo(data.info), data.name || data.value));
+    function prependPreview($li, src) {
+      let previewImg = document.createElement('img');
+      Compress.loadImageElement(previewImg, src).then(function () {
+        URL.revokeObjectURL(src);
+      });
 
-      if (data.preview_url) {
-        prependPreview($li, data.preview_url, false)
-      }
+      $li.find('.thumbnail').remove();
+      $li.prepend('<div class="thumbnail">' + previewImg.outerHTML + '</div>');
     }
 
-    function prependPreview($li, src, revoke) {
-      let previewImg = document.createElement('img')
+    function prependFormatPreview($li, format) {
+      let $thumbnail = $('<div class="thumbnail"></div>');
+      $('<div class="heic"></div>').text(format).appendTo($thumbnail);
 
-      Compress
-        .loadImageElement(previewImg, src)
-        .then(() => {
-          if (revoke) {
-            URL.revokeObjectURL(src)
-          }
-        })
-
-      $li.find('.thumbnail').remove()
-      $li.prepend('<div class="thumbnail">' + previewImg.outerHTML + '</div>')
-    }
-
-    function normalizeInfo(info) {
-      return {
-        startSizeMB: Number(info.startSizeMB),
-        endSizeMB: Number(info.endSizeMB),
-        startWidth: Number(info.startWidth),
-        startHeight: Number(info.startHeight),
-        endWidth: Number(info.endWidth),
-        endHeight: Number(info.endHeight),
-      };
+      $li.find('.thumbnail').remove();
+      $li.prepend($thumbnail);
     }
 
     function getOriginalFileInfo(file) {
       let sizeMB = file.size * 0.000001;
-
       return {
         startSizeMB: sizeMB,
         endSizeMB: sizeMB,
@@ -380,46 +354,33 @@ jQuery(document).ready(function ($) {
 
     function getTemplateLi(info, photoName) {
       return setting.templatePreview
-        .replace("{{photoName}}", photoName)
-        .replace("{{txtInfoFileOrigin}}", setting.info_file_origin)
-        .replace("{{beforeSize}}", info.startSizeMB.toFixed(2))
-        .replace("{{startWidth}}", info.startWidth.toFixed())
-        .replace("{{startHeight}}", info.startHeight.toFixed())
-        .replace("{{txtInfoFileCompress}}", setting.info_file_compress)
-        .replace("{{afterSize}}", info.endSizeMB.toFixed(2))
-        .replace("{{endWidth}}", info.endWidth.toFixed())
-        .replace("{{endHeight}}", info.endHeight.toFixed())
-        .replace("{{txtDelete}}", setting.info_file_delete)
+        .replace('{{photoName}}', escapeHtml(photoName))
+        .replace('{{txtInfoFileOrigin}}', escapeHtml(setting.info_file_origin))
+        .replace('{{beforeSize}}', Number(info.startSizeMB).toFixed(2))
+        .replace('{{startWidth}}', Number(info.startWidth).toFixed())
+        .replace('{{startHeight}}', Number(info.startHeight).toFixed())
+        .replace('{{txtInfoFileCompress}}', escapeHtml(setting.info_file_compress))
+        .replace('{{afterSize}}', Number(info.endSizeMB).toFixed(2))
+        .replace('{{endWidth}}', Number(info.endWidth).toFixed())
+        .replace('{{endHeight}}', Number(info.endHeight).toFixed())
+        .replace('{{txtDelete}}', escapeHtml(setting.info_file_delete));
     }
 
-    /**
-     * Check file extension
-     *
-     * @param images
-     * @return {Array}
-     */
-    function prepareFiles(images) {
-      let result = []
-      let allowFormat = setting.formatFile;
+    function escapeHtml(value) {
+      return $('<div>').text(String(value)).html();
+    }
 
-      for (let i = 0, img; img = images[i]; i++) {
+    function isHeic(file) {
+      return file.name.match(setting.heicFormat);
+    }
 
-        // Only process image files.
-        if (!img.name.match(allowFormat)) {
-          return false;
-        }
-
-        if (!img.type.match('image') && !isServerProcessedHeic(img)) {
-          return false;
-        }
-
-        result.push(img)
-      }
-      return result;
+    function getHeicFormat(file) {
+      let match = file.name.match(setting.heicFormat);
+      return match ? match[1].toUpperCase() : 'HEIC';
     }
 
     function isServerProcessedHeic(file) {
-      return setting.heicServerProcessing && file.name.match(setting.heicFormat);
+      return setting.heicServerProcessing && isHeic(file);
     }
-  }
-})
+  };
+});

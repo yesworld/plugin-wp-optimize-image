@@ -96,6 +96,27 @@
     object-fit: cover;
     object-position: center;
 }
+.wpcf7-images-optimize-upload-wrap .list li .thumbnail .heic {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 72px;
+    width: 28px;
+    margin: 10px auto;
+    padding: 4px 3px;
+    border-radius: 14px;
+    background: #00b9eb;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    font-family: sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+}
 .wpcf7-images-optimize-upload-wrap .list li span {
     border: 0;
     line-height: 20px;

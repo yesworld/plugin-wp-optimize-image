@@ -168,12 +168,12 @@ class Yr3kUploaderAdmin
     public function activate() {}
 
     /**
-     * Remove options from DB and folder from the Server when plugin is deactivated.
+     * Remove legacy temporary files created by plugin versions before 2.4.0.
      */
     public function deactivate()
     {
-        if (file_exists(YR3K_UPLOAD_TEMP_DIR)) {
-            $this->delTree(YR3K_UPLOAD_TEMP_DIR);
+        if ($this->isLegacyTempDir(YR3K_UPLOAD_LEGACY_TEMP_DIR)) {
+            $this->delTree(YR3K_UPLOAD_LEGACY_TEMP_DIR);
         }
 
         foreach ($this->register as $name) {
@@ -192,10 +192,24 @@ class Yr3kUploaderAdmin
     {
         $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
-            is_dir("$dir/$file") ? $this->delTree("$dir/$file") : unlink("$dir/$file");
+            $path = "$dir/$file";
+            is_dir($path) && !is_link($path) ? $this->delTree($path) : unlink($path);
         }
 
         return rmdir($dir);
+    }
+
+    private function isLegacyTempDir($dir)
+    {
+        if (!is_dir($dir)) {
+            return false;
+        }
+
+        $uploads = wp_get_upload_dir();
+        $expected = trailingslashit(wp_normalize_path($uploads['basedir'])) . 'wpcf7_upload_image';
+        $actual = wp_normalize_path(realpath($dir));
+
+        return $actual === $expected;
     }
 
 

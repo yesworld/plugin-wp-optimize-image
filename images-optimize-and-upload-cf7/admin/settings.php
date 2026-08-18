@@ -33,19 +33,7 @@ class Yr3kUploaderSettings
 
     static function supportsHeicHeif()
     {
-        if (!class_exists('Imagick')) {
-            return false;
-        }
-
-        try {
-            $formats = Imagick::queryFormats();
-        } catch (Exception $exception) {
-            return false;
-        }
-
-        $formats = array_map('strtoupper', $formats);
-
-        return !empty(array_intersect(['HEIC', 'HEIF'], $formats));
+        return !empty(self::getSupportedHeicExtensions());
     }
 
     static function isHeicServerProcessingEnabled()
@@ -59,11 +47,44 @@ class Yr3kUploaderSettings
             return strtolower(ltrim(trim($extension), '.'));
         }, explode('|', YR3K_UPLOAD_FILE_FORMATS))));
 
+        // HEIC and HEIF require a server-side decoder. Do not let a manually
+        // entered extension bypass the capability check.
+        $extensions = array_diff($extensions, ['heic', 'heif']);
+
         if (self::isHeicServerProcessingEnabled()) {
-            $extensions = array_merge($extensions, ['heic', 'heif']);
+            $extensions = array_merge($extensions, self::getSupportedHeicExtensions());
         }
 
         return array_values(array_unique($extensions));
+    }
+
+    static function getSupportedHeicExtensions()
+    {
+        if (!class_exists('Imagick')) {
+            return [];
+        }
+
+        try {
+            $formats = array_map('strtoupper', Imagick::queryFormats());
+        } catch (Exception $exception) {
+            return [];
+        }
+
+        $extensions = [];
+        if (in_array('HEIC', $formats, true)) {
+            $extensions[] = 'heic';
+        }
+        if (in_array('HEIF', $formats, true)) {
+            $extensions[] = 'heif';
+        }
+
+        return $extensions;
+    }
+
+    static function canProcessHeicExtension($extension)
+    {
+        return self::isHeicServerProcessingEnabled()
+            && in_array(strtolower($extension), self::getSupportedHeicExtensions(), true);
     }
 
     static function getNumberOption($name, $default)
